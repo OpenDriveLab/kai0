@@ -1,0 +1,137 @@
+[project]
+name = "openpi"
+version = "0.1.0"
+description = "Physical Intelligence open source repo"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dependencies = [
+    "augmax>=0.3.4",
+    "dm-tree>=0.1.8",
+    "einops>=0.8.0",
+    "equinox>=0.11.8",
+    "flatbuffers>=24.3.25",
+    "flax==0.10.2",
+    "fsspec[gcs]>=2024.6.0",
+    "gym-aloha>=0.1.1",
+    "imageio>=2.36.1",
+    "jax[cuda12]==0.5.3",
+    "jaxtyping==0.2.36",
+    "lerobot",
+    "ml_collections==1.0.0",
+    "numpy>=1.22.4,<2.0.0",
+    "numpydantic>=1.6.6",
+    "opencv-python>=4.10.0.84",
+    "openpi-client",
+    "orbax-checkpoint==0.11.13",
+    "pillow>=11.0.0",
+    "sentencepiece>=0.2.0",
+    "torch==2.7.1",
+    "tqdm-loggable>=0.2",
+    "typing-extensions>=4.12.2",
+    "tyro>=0.9.5",
+    "wandb>=0.19.1",
+    "filelock>=3.16.1",
+    "beartype==0.19.0",
+    "treescope>=0.1.7",
+    "transformers==4.53.2",
+    "rich>=14.0.0",
+    "polars>=1.30.0",
+]
+
+
+[project.urls]
+Repository = "https://github.com/Physical-Intelligence/openpi"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "ruff>=0.8.6",
+    "pre-commit>=4.0.1",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.5",
+    "matplotlib>=3.10.0",
+    "pynvml>=12.0.0",
+]
+rlds = [
+    "dlimp",
+    "tensorflow-cpu==2.15.0",
+    "tensorflow-datasets==4.9.9",
+]
+
+[tool.uv]
+override-dependencies = ["ml-dtypes==0.4.1", "tensorstore==0.1.74"]
+
+[tool.uv.sources]
+openpi-client = { workspace = true }
+lerobot = { git = "https://github.com/huggingface/lerobot", rev = "0cf864870cf29f4738d3ade893e6fd13fbd7cdb5" }
+dlimp = { git = "https://github.com/kvablack/dlimp", rev = "ad72ce3a9b414db2185bc0b38461d4101a65477a" }
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["docker", "third_party", "src/openpi/models_pytorch/transformers_replace/*"]
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/rules/
+select = [
+    "B",
+    "C4",
+    "DTZ",
+    "E4",
+    "E7",
+    "E9",
+    "F",
+    "FBT",
+    "FURB",
+    "I",
+    "ICN",
+    "ISC",
+    "LOG",
+    "N",
+    "PD",
+    "PERF",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLR1",
+    "PLR5",
+    "PLW",
+    "PT",
+    "Q",
+    "RET",
+    "RUF",
+    "SIM",
+    "SLF",
+    "T10",
+    "T20",
+    "UP",
+    "W",
+]
+ignore = [
+    "F722",   # Conflicts with array typing.
+    "T201",   # We use print statements.
+    "PD008",  # Lots of false positives.
+    "ISC001", # Disabling to support ruff format.
+    "LOG015", # Use logger.info.
+]
+unfixable = [
+    "B905", # Fix defaults to strict=False, which is not what we want.
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+force-sort-within-sections = true
+single-line-exclusions = ["collections.abc", "typing", "typing_extensions"]
+known-third-party = ["wandb"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+markers = ["manual: should be run manually."]
+testpaths = ["src", "scripts", "packages"]

@@ -1,0 +1,1 @@
+This is the original docker script from openpi. We refer to xxx for better understanding. In kai0 project, we haven't test on docker yet.

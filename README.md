@@ -10,12 +10,12 @@
 
 χ₀ enables two sets of dual-arm robots to collaboratively orchestrate long-horizon garment manipulation — flattening, folding, and hanging — surpassing the state-of-the-art $\pi_{0.5}$ baseline by approximately 250% in success rate, with only 20 hours of data and 8 A100 GPUs.
 
-[[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0) [[Code]](https://github.com/OpenDriveLab/kai0)
+[[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0)
 
 ## Updates
 
-- [Jan 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints.
-- [Dec 2025] χ₀ paper released.
+- [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
+- [Feb 10 2025] χ₀ paper released.
 
 ## Acknowledgement
 
@@ -25,11 +25,11 @@ This repository is built on top of [openpi](https://github.com/Physical-Intellig
 
 χ₀ shares the same system requirements as openpi. You will need an NVIDIA GPU with at least the following specifications:
 
-| Mode               | Memory Required | Example GPU        |
-| ------------------ | --------------- | ------------------ |
-| Inference          | > 8 GB          | RTX 4090           |
-| Fine-Tuning (LoRA) | > 22.5 GB       | RTX 4090           |
-| Fine-Tuning (Full) | > 70 GB         | A100 (80GB) / H100 |
+| Mode               | Memory Required | Example GPU           |
+| ------------------ | --------------- | --------------------- |
+| Inference          | > 8 GB          | RTX 4090              |
+| Fine-Tuning (LoRA) | > 22.5 GB       | RTX 4090 (not tested) |
+| Fine-Tuning (Full) | > 70 GB         | A100 (80GB) / H100    |
 
 For Model Arithmetic (mixing checkpoints), GPU memory requirements depend on the model size and number of checkpoints being mixed. A single A100 (80GB) is sufficient for most use cases.
 
@@ -53,7 +53,7 @@ GIT_LFS_SKIP_SMUDGE=1 uv sync
 GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
 ```
 
-For PyTorch checkpoint mixing, ensure `safetensors` is installed:
+For PyTorch checkpoint mixing (not tested thoroughly), ensure `safetensors` is installed:
 
 ```bash
 uv pip install safetensors
@@ -71,7 +71,7 @@ uv pip install safetensors
 
 Model Arithmetic combines multiple trained openpi model checkpoints into a single mixed model using optimized weighted averaging. This enables efficiently aggregating knowledge from models trained on different data subsets (e.g., different object appearances, state variations) without requiring Mixture-of-Experts architectures.
 
-Both JAX (Orbax/OCDBT) and PyTorch (`model.safetensors`) checkpoints are supported. Five mixing methods are available: **inverse_loss**, **gradient_descent**, **adaptive_gradient_descent**, **greedy**, and **manual weights**.
+Both JAX (Orbax/OCDBT) and PyTorch (`model.safetensors`) checkpoints (not tested thoroughly) are supported. Five mixing methods are available: **inverse_loss**, **gradient_descent**, **adaptive_gradient_descent**, **greedy**, and **manual weights**.
 
 ### Workflow
 
@@ -82,6 +82,8 @@ The mixing process follows three steps:
 3. Mix the checkpoints using one of the supported methods.
 
 ### Quick Start
+
+Taking Task C (hanging clothes) as an example:
 
 **Step 1: Dump validation data**
 
@@ -107,7 +109,7 @@ python model_arithmetic/arithmetic.py \
   --use_gpu \
   --gpu_ids "0"
 
-# PyTorch checkpoints
+# PyTorch checkpoints (not tested thoroughly)
 python model_arithmetic/arithmetic_torch.py \
   --config pi05_hang_cloth \
   --data-path hang_cloth_val.pkl \

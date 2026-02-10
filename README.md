@@ -1,4 +1,4 @@
-# χ₀: Resource-Aware Robust Manipulation viaTaming Distributional Inconsistencies
+# χ₀: Resource-Aware Robust Manipulation via Taming Distributional Inconsistencies
 
 <div id="top" align="center">
 

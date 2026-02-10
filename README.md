@@ -101,7 +101,11 @@ python scripts/download_dataset.py
 
 This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see [DATASET.md](DATASET.md#step-1-download-the-dataset).
 
-### 2. Fine-tune with normal π₀.₅
+### 2. Download checkpoints (optional, for testing)
+
+We provide **one best model per task** (FlattenFold, HangCloth, TeeShirtSort) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main). Download the task folder(s) you need and set `weight_loader` in config to the path of the downloaded checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
+
+### 3. Fine-tune with normal π₀.5
 
 After the dataset is in `./data`, you can run **normal π₀.5 full fine-tuning** on it, then use the resulting checkpoints for [Model Arithmetic](#model-arithmetic).
 
@@ -109,8 +113,8 @@ After the dataset is in `./data`, you can run **normal π₀.5 full fine-tuning*
 
 Edit [`src/openpi/training/config.py`](src/openpi/training/config.py) (around lines 1173–1226) for the task(s) you need:
 
-- **`repo_id`**: set to the **absolute path** to the dataset subset, e.g. `<path_to_repo_root>/data/FlattenFold/base`
-- **`weight_loader`**: set to the path of your **π₀.5 base checkpoint** (e.g. openpi’s pretrained pi05 checkpoint).
+- **`repo_id`**: set to the **absolute path** to the dataset subset, e.g. `<path_to_repo_root>/data/FlattenFold/base`, `<path_to_repo_root>/data/TeeShirtSort/base`, or `<path_to_repo_root>/data/HangCloth/base`.
+- **`weight_loader`**: set to the path of your **π₀.5 base checkpoint** — either the best model you downloaded in step 2 above, or openpi’s pretrained π₀.5 checkpoint.
 
 Config names to use: e.g. `pi05_flatten_fold_normal`
 
@@ -130,7 +134,7 @@ XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py <config_name> --exp_n
 
 Example: `XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_normal --exp_name=flatten_fold_run1`
 
-Checkpoints are written to the config’s checkpoint directory. You can then use these checkpoints as inputs to **model arithmetic** (see [Model Arithmetic](#model-arithmetic)).
+Checkpoints are written to the config’s checkpoint directory. You can then use your checkpoints as inputs to **model arithmetic** (see [Model Arithmetic](#model-arithmetic)).
 
 ## Project Overview
 

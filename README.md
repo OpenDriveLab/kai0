@@ -35,6 +35,29 @@
 
 https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
 
+## Table of Contents
+
+- [Updates](#updates)
+- [Acknowledgement](#acknowledgement)
+- [Requirements](#requirements)
+  - [Compute](#compute)
+  - [Hardware](#hardware)
+- [Installation](#installation)
+- [Preparation](#preparation)
+  - [1. Download the dataset](#1-download-the-dataset)
+  - [2. Download checkpoints (optional, for testing)](#2-download-checkpoints-optional-for-testing)
+  - [3. Fine-tune with normal π₀.5](#3-fine-tune-with-normal-π₀5)
+- [Project Overview](#project-overview)
+- [Modules Overview and To-Do List](#modules-overview-and-to-do-list)
+- [Model Arithmetic](#model-arithmetic)
+  - [Workflow](#workflow)
+  - [Quick Start](#quick-start)
+- [Stage Advantage (Coming Soon)](#stage-advantage-coming-soon)
+- [Train-Deploy Alignment (Coming Soon)](#train-deploy-alignment-coming-soon)
+- [Citation](#citation)
+- [Troubleshooting](#troubleshooting)
+- [Links and Community](#links-and-community)
+
 ## Updates
 
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
@@ -62,7 +85,7 @@ The repo has been tested with Ubuntu 22.04.
 
 ### Hardware
 
-For real-robot deployment (dual-arm setup, cameras, and table layout), see **[Hardware Setup & 3D Print Files](setup/README.md)**. That document covers supported platforms (Agilex Piper for FlattenFold / TeeShirtSort, ARX X5 for HangCloth), Intel RealSense D435 camera placement, 3D-printed grippers and mounts with usage notes, and inference host GPU (RTX 4090 in Ubuntu 20.04).
+For real-robot deployment (dual-arm setup, cameras, and table layout), see **[Hardware Setup & 3D Print Files](setup/README.md)**. That document covers supported platforms (Agilex Piper for FlattenFold / TeeShirtSort, ARX X5 for HangCloth), Intel RealSense D435i camera placement, 3D-printed grippers and mounts with usage notes, and inference host GPU (RTX 4090 in Ubuntu 20.04).
 
 ## Installation
 

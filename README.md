@@ -2,6 +2,7 @@
 
 
 <div>
+
 <a href="https://mmlab.hk/research/kai0" target="_blank"><img src="https://img.shields.io/badge/Blog_Page-green" alt="Blog Page"></a>
 <a href="https://github.com/OpenDriveLab/kai0"><img alt="Repo" src="https://img.shields.io/badge/github-repo-blue?logo=github"/></a>
 <a href="https://arxiv.org/abs/2602.09021" target="_blank"><img src="https://img.shields.io/badge/arXiv-2602.09021-b31b1b" alt="arXiv"></a>
@@ -17,7 +18,6 @@
 <a href="https://www.modelscope.cn/models/OpenDriveLab/Kai0">
   <img alt="ModelScope" src="https://img.shields.io/badge/ModelScope-Kai0_Model-purple"/>
 </a>
-
 
 </div>
 
@@ -54,7 +54,7 @@ https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
   - [Quick Start](#quick-start)
 - [Stage Advantage (Coming Soon)](#stage-advantage-coming-soon)
 - [Train-Deploy Alignment (Coming Soon)](#train-deploy-alignment-coming-soon)
-- [Citation](#citation)
+- [Citation](#licenseandcitation)
 - [Troubleshooting](#troubleshooting)
 - [Links and Community](#links-and-community)
 
@@ -273,9 +273,9 @@ Train-Deploy Alignment bridges the distribution gap between training and real-wo
 
 **This module is currently under refinement and will be released soon.**
 
-## Citation
+## License and Citation
 
-If you find χ₀ useful in your research, please consider citing:
+All assets and code in this repository are under the Apache 2.0 license unless specified otherwise. The data and checkpoint are under CC BY-NC-SA 4.0. Other modules (including PaliGemma) inherit their own distribution licenses. If you find χ₀ useful in your research, please consider citing:
 
 ```bibtex
 @article{sima2026kai0,

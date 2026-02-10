@@ -1,5 +1,20 @@
 # χ₀
 
+
+<div>
+<a href="https://mmlab.hk/research/kai0" target="_blank"><img src="https://img.shields.io/badge/Blog_Page-green" alt="Blog Page"></a>
+<a href="https://github.com/OpenDriveLab/kai0"><img alt="Repo" src="https://img.shields.io/badge/github-repo-blue?logo=github"/></a>
+<a href="https://arxiv.org/abs/2602.09021" target="_blank"><img src="https://img.shields.io/badge/arXiv-2602.09021-b31b1b" alt="arXiv"></a>
+<a href="https://huggingface.co/datasets/OpenDriveLab-org/Kai0">
+  <img alt="Kai0 Data" src="https://img.shields.io/badge/huggingface-Kai0_Data-orange?logo=huggingface&logoColor=white"/>
+</a>
+<a href="https://www.modelscope.cn/models/OpenDriveLab/Kai0">
+  <img alt="ModelScope" src="https://img.shields.io/badge/ModelScope-Kai0_Data-purple"/>
+</a>
+
+
+</div>
+
 χ₀ (**kai0**) is a resource-efficient framework for achieving production-level robustness in robotic manipulation by taming distributional inconsistencies. This repository is built on top of [openpi](https://github.com/Physical-Intelligence/openpi), the open-source models and packages for robotics published by the [Physical Intelligence team](https://www.physicalintelligence.company/).
 
 χ₀ addresses the systematic distributional shift among the human demonstration distribution ($P_\text{train}$), the inductive bias learned by the policy ($Q_\text{model}$), and the test-time execution distribution ($P_\text{test}$) through three technical modules:
@@ -23,6 +38,8 @@ This repository is built on top of [openpi](https://github.com/Physical-Intellig
 
 ## Requirements
 
+### Compute
+
 χ₀ shares the same system requirements as openpi. You will need an NVIDIA GPU with at least the following specifications:
 
 | Mode               | Memory Required | Example GPU           |
@@ -34,6 +51,10 @@ This repository is built on top of [openpi](https://github.com/Physical-Intellig
 For Model Arithmetic (mixing checkpoints), GPU memory requirements depend on the model size and number of checkpoints being mixed. A single A100 (80GB) is sufficient for most use cases.
 
 The repo has been tested with Ubuntu 22.04.
+
+### Hardware
+
+For real-robot deployment (dual-arm setup, cameras, and table layout), see **[Hardware Setup & 3D Print Files](setup/SETUP.md)**. That document covers supported platforms (Agilex Piper for FlattenFold / TeeShirtSort, ARX X5 for HangCloth), Intel RealSense D435 camera placement, 3D-printed grippers and mounts with usage notes, and inference host GPU (RTX 4090 in Ubuntu 20.04).
 
 ## Installation
 

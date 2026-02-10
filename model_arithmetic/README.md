@@ -11,7 +11,7 @@ Workflow:
 You need a working OpenPI environment (same as training): JAX/Flax for JAX, PyTorch + `safetensors` for PyTorch, and the `openpi` package.  
 Scripts: `split_data.py`, `dump_data.py`, `arithmetic.py` (JAX), `arithmetic_torch.py` (PyTorch). Shared helpers live in `arithmetic_common.py`.
 
-Both `arithmetic.py` and `arithmetic_torch.py` support the same methods: **inverse_loss**, **gradient_descent**, **adaptive_gradient_descent**, **greedy**, and manual **--weights**.
+Both `arithmetic.py` and `arithmetic_torch.py` support the same methods: **average**, **inverse_loss**, **gradient_descent**, **adaptive_gradient_descent**, **greedy**, and manual **--weights**.
 
 ---
 
@@ -66,7 +66,27 @@ Choose one of the following methods. Examples below use `arithmetic.py` (JAX); f
 
 ---
 
-### Method 1: `inverse loss`
+### Method 1: `average`
+
+Equal weighting: with \(N\) checkpoints, each gets weight \(1/N\). No validation data or optimization; fastest option.
+
+```bash
+python model_arithmetic/arithmetic.py \
+  --config pi05_hang_cloth \
+  --data-path hang_cloth_val.pkl \
+  --checkpoints \
+    /path/to/ckpt_run1/90000 \
+    /path/to/ckpt_run2/90000 \
+    /path/to/ckpt_run3/90000 \
+  --output /path/to/mixed_ckpt_avg \
+  --optimize_method average \
+  --use_gpu \
+  --gpu_ids "0"
+```
+
+---
+
+### Method 2: `inverse loss`
 
 Compute each checkpoint’s loss on the validation set, then set weight proportional to \(1/\text{loss}^2\). Lower loss → higher weight. No gradient step, fast.
 
@@ -86,7 +106,7 @@ python model_arithmetic/arithmetic.py \
 
 ---
 
-### Method 2: `gradient descent`
+### Method 3: `gradient descent`
 
 Optimize mixing weights by gradient descent on the mixed model’s validation loss (Adam + cosine LR). Usually gives better weights than inverse_loss. Tune `--num_iterations` and `--learning_rate` if needed.
 
@@ -108,7 +128,7 @@ python model_arithmetic/arithmetic.py \
 
 ---
 
-### Method 3: `adaptive gradient descent`
+### Method 4: `adaptive gradient descent`
 
 Same as gradient_descent but scales the gradient step by the current loss (larger loss → larger update). Can help when losses vary a lot. Same args as gradient_descent.
 
@@ -130,7 +150,7 @@ python model_arithmetic/arithmetic.py \
 
 ---
 
-### Method 4: `greedy search`
+### Method 5: `greedy search`
 
 Greedy forward selection: (1) pick the single checkpoint with lowest loss, (2) repeatedly add the checkpoint that most improves the (equal-weight) mix, (3) stop when no improvement. No continuous weights—only which checkpoints to include and equal weighting among them. No `--num_iterations` or `--learning_rate`.
 
@@ -150,7 +170,7 @@ python model_arithmetic/arithmetic.py \
 
 ---
 
-### Method 5: Manual weights
+### Method 6: Manual weights
 
 If you already know the weights (e.g. 0.5, 0.3, 0.2), pass them with `--weights`. They will be normalized to sum to 1. Do not set `--optimize_method`.
 
@@ -174,7 +194,7 @@ Number of values in `--weights` must match the number of checkpoints.
 
 ### PyTorch checkpoints: `arithmetic_torch.py`
 
-For OpenPI PyTorch checkpoints (each dir must contain `model.safetensors`), use `arithmetic_torch.py`. Same methods as JAX (inverse_loss, gradient_descent, adaptive_gradient_descent, greedy, manual `--weights`).
+For OpenPI PyTorch checkpoints (each dir must contain `model.safetensors`), use `arithmetic_torch.py`. Same methods as JAX (average, inverse_loss, gradient_descent, adaptive_gradient_descent, greedy, manual `--weights`).
 
 Example with gradient_descent:
 

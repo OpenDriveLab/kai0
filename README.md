@@ -132,7 +132,7 @@ uv pip install safetensors
 
 Model Arithmetic combines multiple trained openpi model checkpoints into a single mixed model using optimized weighted averaging. This enables efficiently aggregating knowledge from models trained on different data subsets (e.g., different object appearances, state variations) without requiring Mixture-of-Experts architectures.
 
-Both JAX (Orbax/OCDBT) and PyTorch (`model.safetensors`) checkpoints (not tested thoroughly) are supported. Five mixing methods are available: **inverse_loss**, **gradient_descent**, **adaptive_gradient_descent**, **greedy**, and **manual weights**.
+Both JAX (Orbax/OCDBT) and PyTorch (`model.safetensors`) checkpoints (not tested thoroughly) are supported. Six mixing methods are available: **average** (equal weight \(1/N\) per checkpoint), **inverse_loss**, **gradient_descent**, **adaptive_gradient_descent**, **greedy**, and **manual weights**.
 
 ### Workflow
 

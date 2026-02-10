@@ -452,7 +452,7 @@ def main():
         "--optimize_method",
         type=str,
         default="gradient_descent",
-        choices=["inverse_loss", "gradient_descent", "adaptive_gradient_descent", "greedy"],
+        choices=["average", "inverse_loss", "gradient_descent", "adaptive_gradient_descent", "greedy"],
     )
     parser.add_argument("--num_iterations", type=int, default=50)
     parser.add_argument("--learning_rate", type=float, default=0.05)
@@ -473,7 +473,11 @@ def main():
     # Compute weights: by optimization or use provided
     losses = []
     if args.weights is None:
-        if args.optimize_method == "gradient_descent":
+        if args.optimize_method == "average":
+            n = len(args.checkpoints)
+            args.weights = [1.0 / n] * n
+            print(f"\n✓ Average weights (1/{n} each): {args.weights}")
+        elif args.optimize_method == "gradient_descent":
             args.weights = optimize_weights_with_gradient_descent(
                 args.checkpoints, config, data_samples_list,
                 num_iterations=args.num_iterations, learning_rate=args.learning_rate

@@ -115,11 +115,25 @@ Download the Kai0 dataset so it is available under `./data` for training and eva
 python scripts/download_dataset.py
 ```
 
-This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see [DATASET.md](DATASET.md#step-1-download-the-dataset).
+This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see the [dataset docs](docs/dataset.md#step-1-download-the-dataset).
 
 ### 2. Download checkpoints (optional, for testing)
 
-We provide **one best model per task** (FlattenFold, HangCloth, TeeShirtSort) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main). Download the task folder(s) you need and set `weight_loader` in config to the path of the downloaded checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
+We provide **one best model per task** (FlattenFold, HangCloth, TeeShirtSort) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main).
+
+From the repository root, you can download all best-model checkpoints to `./checkpoints` with:
+
+```bash
+python scripts/download_checkpoints.py
+```
+
+To download only specific tasks or use a custom path, run:
+
+```bash
+python scripts/download_checkpoints.py --tasks FlattenFold HangCloth --local-dir ./my_checkpoints
+```
+
+After download, set `weight_loader` in the training config to the path of the corresponding checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
 
 ### 3. Fine-tune with normal π₀.5
 

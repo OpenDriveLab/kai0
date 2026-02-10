@@ -218,3 +218,20 @@ If you find χ₀ useful in your research, please consider citing:
 - [SparseVideoNav](https://github.com/OpenDriveLab/SparseVideoNav)
 <!-- - [X (Twitter)](https://x.com/OpenDriveLab/status/2003745616955142150)
 - [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7409531902761795584/) -->
+
+Join our community for discussions, questions, and updates:
+
+<table>
+  <tr>
+    <td align="center"><b>Discord</b></td>
+    <td align="center"><b>Feishu</b></td>
+    <td align="center"><b>WeChat Group</b></td>
+    <td align="center"><b>WeChat Chonghao</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/community_qrcode/discord_qrcode.jpg" width="200"></td>
+    <td align="center"><img src="assets/community_qrcode/feishu_qrcode.png" width="200"></td>
+    <td align="center"><img src="assets/community_qrcode/wechat_qrcode.jpeg" width="200"></td>
+    <td align="center"><img src="assets/community_qrcode/wechat_smch_qrcode.jpeg" width="200"></td>
+  </tr>
+</table>

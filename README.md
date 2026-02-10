@@ -55,7 +55,7 @@ https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
 ## Update
 
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
-- [Feb 10 2025] χ₀ paper released.
+- [Feb 10 2026] χ₀ paper released.
 
 ## Acknowledgement
 

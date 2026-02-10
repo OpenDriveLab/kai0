@@ -101,7 +101,7 @@ python scripts/download_dataset.py
 
 This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see [DATASET.md](DATASET.md#step-1-download-the-dataset).
 
-### 2. Fine-tune with normal π₀.5
+### 2. Fine-tune with normal π₀.₅
 
 After the dataset is in `./data`, you can run **normal π₀.5 full fine-tuning** on it, then use the resulting checkpoints for [Model Arithmetic](#model-arithmetic).
 
@@ -114,7 +114,7 @@ Edit [`src/openpi/training/config.py`](src/openpi/training/config.py) (around li
 
 Config names to use: e.g. `pi05_flatten_fold_normal`
 
-**Compute normalization stats**
+**Compute normalization stats with our optimized scripts**
 
 ```bash
 uv run python scripts/compute_norm_states_fast.py --config-name <config_name>

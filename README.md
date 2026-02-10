@@ -1,23 +1,17 @@
 # χ₀
 
 
-<div>
+<div id="top" align="center">
 
-<a href="https://mmlab.hk/research/kai0" target="_blank"><img src="https://img.shields.io/badge/Blog_Page-green" alt="Blog Page"></a>
-<a href="https://github.com/OpenDriveLab/kai0"><img alt="Repo" src="https://img.shields.io/badge/github-repo-blue?logo=github"/></a>
-<a href="https://arxiv.org/abs/2602.09021" target="_blank"><img src="https://img.shields.io/badge/arXiv-2602.09021-b31b1b" alt="arXiv"></a>
-<a href="https://huggingface.co/datasets/OpenDriveLab-org/Kai0">
-  <img alt="Kai0 Data" src="https://img.shields.io/badge/huggingface-Kai0_Data-orange?logo=huggingface&logoColor=white"/>
-</a>
-<a href="https://huggingface.co/OpenDriveLab-org/Kai0">
-  <img alt="Kai0 Model" src="https://img.shields.io/badge/huggingface-Kai0_Model-orange?logo=huggingface&logoColor=white"/>
-</a>
-<a href="https://www.modelscope.cn/datasets/OpenDriveLab/Kai0">
-  <img alt="ModelScope" src="https://img.shields.io/badge/ModelScope-Kai0_Data-purple"/>
-</a>
-<a href="https://www.modelscope.cn/models/OpenDriveLab/Kai0">
-  <img alt="ModelScope" src="https://img.shields.io/badge/ModelScope-Kai0_Model-purple"/>
-</a>
+[![Blog Page](https://img.shields.io/badge/Blog_Page-green)](https://mmlab.hk/research/kai0)
+[![arXiv](https://img.shields.io/badge/arXiv-2602.09021-b31b1b)](https://arxiv.org/abs/2602.09021)
+[![Kai0 Data](https://img.shields.io/badge/huggingface-Kai0_Data-orange?logo=huggingface&logoColor=white)](https://huggingface.co/datasets/OpenDriveLab-org/Kai0)
+[![Kai0 Model](https://img.shields.io/badge/huggingface-Kai0_Model-orange?logo=huggingface&logoColor=white)](https://huggingface.co/OpenDriveLab-org/Kai0)
+[![ModelScope Data](https://img.shields.io/badge/ModelScope-Kai0_Data-purple)](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0)
+[![ModelScope Model](https://img.shields.io/badge/ModelScope-Kai0_Model-purple)](https://www.modelscope.cn/models/OpenDriveLab/Kai0)
+
+<!-- [![Repo](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/OpenDriveLab/kai0) -->
+
 
 </div>
 

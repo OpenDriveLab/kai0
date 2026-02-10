@@ -209,7 +209,7 @@ If you find χ₀ useful in your research, please consider citing:
 }
 ```
 
-## Links
+## Links and Community
 
 - [Paper](https://github.com/OpenDriveLab/kai0)
 - [Project Blog](https://mmlab.hk/research/kai0)

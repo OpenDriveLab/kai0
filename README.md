@@ -140,11 +140,11 @@ Train-Deploy Alignment bridges the distribution gap between training and real-wo
 If you find χ₀ useful in your research, please consider citing:
 
 ```bibtex
-@article{kai0,
+@article{sima2026kai0,
   title={χ₀: Resource-Aware Robust Manipulation via Taming Distributional Inconsistencies},
   author={Yu, Checheng and Sima, Chonghao and Jiang, Gangcheng and Zhang, Hai and Mai, Haoguang and Li, Hongyang and Wang, Huijie and Chen, Jin and Wu, Kaiyang and Chen, Li and Zhao, Lirui and Shi, Modi and Luo, Ping and Bu, Qingwen and Peng, Shijia and Li, Tianyu and Yuan, Yibo},
-  journal={arXiv preprint},
-  year={2025}
+  journal={arXiv preprint arXiv:2602.09021},
+  year={2026}
 }
 ```
 
@@ -153,5 +153,7 @@ If you find χ₀ useful in your research, please consider citing:
 - [Paper](https://github.com/OpenDriveLab/kai0)
 - [Project Blog](https://mmlab.hk/research/kai0)
 - [openpi (Base Repository)](https://github.com/Physical-Intelligence/openpi)
-- [X (Twitter)](https://x.com/OpenDriveLab/status/2003745616955142150)
-- [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7409531902761795584/)
+- [UniVLA](https://github.com/OpenDriveLab/UniVLA)
+- [SparseVideoNav](https://github.com/OpenDriveLab/SparseVideoNav)
+<!-- - [X (Twitter)](https://x.com/OpenDriveLab/status/2003745616955142150)
+- [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7409531902761795584/) -->

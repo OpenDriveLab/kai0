@@ -25,7 +25,7 @@
 
 χ₀ enables two sets of dual-arm robots to collaboratively orchestrate long-horizon garment manipulation — flattening, folding, and hanging — surpassing the state-of-the-art $\pi_{0.5}$ baseline by approximately 250% in success rate, with only 20 hours of data and 8 A100 GPUs.
 
-[[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0)
+<!-- [[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0) -->
 
 https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
 

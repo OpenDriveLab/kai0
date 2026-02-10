@@ -88,6 +88,50 @@ For PyTorch checkpoint mixing (not tested thoroughly), ensure `safetensors` is i
 uv pip install safetensors
 ```
 
+## Preparation
+
+### 1. Download the dataset
+
+Download the Kai0 dataset so it is available under `./data` for training and evaluation. From the repository root, run:
+
+```bash
+pip install huggingface_hub   # if not already installed
+python scripts/download_dataset.py
+```
+
+This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see [DATASET.md](DATASET.md#step-1-download-the-dataset).
+
+### 2. Fine-tune with normal π₀.5
+
+After the dataset is in `./data`, you can run **normal π₀.5 full fine-tuning** on it, then use the resulting checkpoints for [Model Arithmetic](#model-arithmetic).
+
+**Set paths in config**
+
+Edit [`src/openpi/training/config.py`](src/openpi/training/config.py) (around lines 1173–1226) for the task(s) you need:
+
+- **`repo_id`**: set to the **absolute path** to the dataset subset, e.g. `<path_to_repo_root>/data/FlattenFold/base`
+- **`weight_loader`**: set to the path of your **π₀.5 base checkpoint** (e.g. openpi’s pretrained pi05 checkpoint).
+
+Config names to use: e.g. `pi05_flatten_fold_normal`
+
+**Compute normalization stats**
+
+```bash
+uv run python scripts/compute_norm_states_fast.py --config-name <config_name>
+```
+
+Example: `uv run python scripts/compute_norm_states_fast.py --config-name pi05_flatten_fold_normal`
+
+**Start training**
+
+```bash
+XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py <config_name> --exp_name=<your_experiment_name>
+```
+
+Example: `XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_normal --exp_name=flatten_fold_run1`
+
+Checkpoints are written to the config’s checkpoint directory. You can then use these checkpoints as inputs to **model arithmetic** (see [Model Arithmetic](#model-arithmetic)).
+
 ## Project Overview
 
 ```
@@ -209,7 +253,15 @@ If you find χ₀ useful in your research, please consider citing:
 }
 ```
 
+<<<<<<< Updated upstream
 ## Links and Community
+=======
+## Troubleshooting
+
+*(Common issues and fixes will be added as we go.)*
+
+## Links
+>>>>>>> Stashed changes
 
 - [Paper](https://github.com/OpenDriveLab/kai0)
 - [Project Blog](https://mmlab.hk/research/kai0)

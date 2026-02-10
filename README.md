@@ -8,8 +8,14 @@
 <a href="https://huggingface.co/datasets/OpenDriveLab-org/Kai0">
   <img alt="Kai0 Data" src="https://img.shields.io/badge/huggingface-Kai0_Data-orange?logo=huggingface&logoColor=white"/>
 </a>
-<a href="https://www.modelscope.cn/models/OpenDriveLab/Kai0">
+<a href="https://huggingface.co/OpenDriveLab-org/Kai0">
+  <img alt="Kai0 Model" src="https://img.shields.io/badge/huggingface-Kai0_Model-orange?logo=huggingface&logoColor=white"/>
+</a>
+<a href="https://www.modelscope.cn/datasets/OpenDriveLab/Kai0">
   <img alt="ModelScope" src="https://img.shields.io/badge/ModelScope-Kai0_Data-purple"/>
+</a>
+<a href="https://www.modelscope.cn/models/OpenDriveLab/Kai0">
+  <img alt="ModelScope" src="https://img.shields.io/badge/ModelScope-Kai0_Model-purple"/>
 </a>
 
 

@@ -1167,7 +1167,72 @@ _CONFIGS = [
         wandb_enabled=False,
     ),
 
-    #************************advantage estimator***************************
+
+
+
+    #**************************FlattenFold Normal PI05*******************************
+    TrainConfig(
+        name="pi05_flatten_fold_normal",
+        model=pi0_config.Pi0Config(pi05=True),
+        data = LerobotAgilexDataConfig(
+            # TODO: Replace with the actual path to the flattenfold dataset.
+            repo_id="<path/to/flattenfold_dataset>",
+            default_prompt="Flatten and fold the cloth.",
+            use_delta_joint_actions=False,
+        ),
+        # TODO: Replace with the actual path to the pi05_base checkpoint.
+        weight_loader=weight_loaders.CheckpointWeightLoader("<path/to/pi05_base/checkpoint>"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8, 
+        # TODO: 8 * A100 settings, replace with the actual batch size.
+        batch_size=256, 
+    ),
+    #**************************TeeShirtSort Normal PI05*******************************
+    TrainConfig(
+        name="pi05_tee_shirt_sort_normal",
+        model=pi0_config.Pi0Config(pi05=True),
+        data = LerobotAgilexDataConfig(
+            # TODO: Replace with the actual path to the tee_shirt_sort dataset.
+            repo_id="<path/to/tee_shirt_sort_dataset>",
+            default_prompt="Fetch the clothes, fold the tee shirts and hand-over the collared shirts.",
+            use_delta_joint_actions=False,
+        ),
+        # TODO: Replace with the actual path to the pi05_base checkpoint.
+        weight_loader=weight_loaders.CheckpointWeightLoader("<path/to/pi05_base/checkpoint>"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8, 
+        # TODO: 8 * A100 settings, replace with the actual batch size.
+        batch_size=256, 
+    ),
+    #**************************HangCloth Normal PI05*******************************
+    TrainConfig(
+        name="pi05_hang_cloth_normal",
+        model=pi0_config.Pi0Config(pi05=True),
+        data = LerobotARXDataConfig(
+            # TODO: Replace with the actual path to the hangcloth dataset.
+            repo_id="<path/to/hang_cloth_dataset>",
+            default_prompt="Fetch and hang the cloth.",
+            use_delta_joint_actions=False,
+        ),
+        # TODO: Replace with the actual path to the pi05_base checkpoint.
+        weight_loader=weight_loaders.CheckpointWeightLoader("<path/to/pi05_base/checkpoint>"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8, 
+        # TODO: 8 * A100 settings, replace with the actual batch size.
+        batch_size=256, 
+    ),
+
+    #**************************FlattenFold AWBC*******************************
+
+    #**************************TeeShirtSort AWBC*******************************
+    
+    #**************************HangCloth AWBC*******************************
+
+
+    #************************Advantage Estimator***************************
     TrainConfig(
         name="ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD",
         advantage_estimator=True,

@@ -9,8 +9,6 @@ import torch
 import openpi.models.model as _model
 import openpi.transforms as transforms
 
-from openpi.policies.ARX_fk import batch_qpos_to_eef_pos
-
 @dataclasses.dataclass(frozen=True)
 class ARXInputs(transforms.DataTransformFn):
     """Inputs for the ARX policy.
@@ -39,10 +37,6 @@ class ARXInputs(transforms.DataTransformFn):
     
     # if set all state to zeros
     mask_state: bool = False
-
-    # if convert to eef position
-    convert_to_eef_position: bool = False
-
 
 
     def __call__(self, data: dict) -> dict:
@@ -75,9 +69,6 @@ class ARXInputs(transforms.DataTransformFn):
         # Create image mask based on available cameras
         image_mask = {self.rename_map[camera]: np.True_ for camera in self.EXPECTED_CAMERAS}
 
-        if self.convert_to_eef_position:
-            state[..., :14] = batch_qpos_to_eef_pos(state[..., :14])
-
         # Prepare inputs dictionary
         masked_state = np.zeros_like(state) if self.mask_state else state
         inputs = {
@@ -102,9 +93,6 @@ class ARXInputs(transforms.DataTransformFn):
         # Add prompt if present
         if "prompt" in data:
             inputs["prompt"] = data["prompt"]
-
-        # for key, value in inputs.items():
-        #     print(key, value.shape) if isinstance(value, np.ndarray) else print(key, type(value))
 
         return inputs
 

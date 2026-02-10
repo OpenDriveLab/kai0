@@ -88,13 +88,45 @@ For PyTorch checkpoint mixing (not tested thoroughly), ensure `safetensors` is i
 uv pip install safetensors
 ```
 
+## Project Overview
+
+```
++-----------------------------------------------------------------------------------------------+
+|                                    kai0 Framework Overview                                    |
+|   Built on openpi: full-param finetuning of pi0/pi0.5 + server/client inference               |
++-----------------------------------------------------------------------------------------------+
+|                                                                                               |
+|   Main Pipeline:                                                                              |
+|                                                                                               |
+|   +----------------+     +----------------+     +----------------+     +----------------+     |
+|   |Data Processing |     |Model Finetuning|     |Model Arithmetic|     |Infer. & Deploy |     |
+|   | augment,mirror |---->| pi0/pi0.5 full |---->| ckpt merging,  |---->| server/client, |     |
+|   | scale, merge   |     | param training |     | weight optimize|     | DAgger, smooth |     |
+|   | train_deploy_  |     | openpi train   |     | model_         |     | train_deploy_  |     |
+|   | alignment/data |     | scripts        |     | arithmetic/    |     | alignment/     |     |
+|   +----------------+     +--------^-------+     +----------------+     +----------------+     |
+|                                   |                                                           |
+|                                   | advantage labels enable                                   |
+|                                   | advantage-weighted regression                             |
+|                                   |                                                           |
+|   Stage Advantage Pipeline:       |                                                           |
+|                                   |                                                           |
+|   +----------------+     +--------+-------+     +----------------+                            |
+|   | GT Data        |     | Train          |     | Adv. Labelling |                            |
+|   | Labelling      |---->| Adv. Estimator |---->| (prediction)   |                            |
+|   | stage_adv./    |     | stage_adv./    |     | stage_adv./    |                            |
+|   +----------------+     +----------------+     +----------------+                            |
+|                                                                                               |
++-----------------------------------------------------------------------------------------------+
+```
+
 ## Modules Overview
 
 | Module                  | Description                                                        | Status       |
 | ----------------------- | ------------------------------------------------------------------ | ------------ |
 | Model Arithmetic        | Weight-space merging of multiple trained checkpoints                | Released     |
-| Stage Advantage         | Stage-aware advantage estimation for policy training                | Coming Soon  |
-| Train-Deploy Alignment  | DAgger, spatio-temporal augmentation, and chunk-wise smoothing      | Coming Soon  |
+| Stage Advantage         | Stage-aware advantage estimation for policy training                | Coming Soon Before CNY  |
+| Train-Deploy Alignment  | DAgger, spatio-temporal augmentation, and chunk-wise smoothing      | Coming Soon Before CNY |
 
 ## Model Arithmetic
 

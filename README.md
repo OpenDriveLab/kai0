@@ -27,6 +27,8 @@
 
 [[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0)
 
+https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
+
 ## Updates
 
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).

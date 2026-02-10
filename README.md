@@ -75,7 +75,7 @@ This repository is built on top of [openpi](https://github.com/Physical-Intellig
 
 For Model Arithmetic (mixing checkpoints), GPU memory requirements depend on the model size and number of checkpoints being mixed. A single A100 (80GB) is sufficient for most use cases.
 
-The repo has been tested with Ubuntu 22.04.
+Non-edge components (e.g., Policy Training, Model Arithmetic) have been tested on Ubuntu 22.04.
 
 ### Hardware
 
@@ -112,7 +112,6 @@ uv pip install safetensors
 Download the Kai0 dataset so it is available under `./data` for training and evaluation. From the repository root, run:
 
 ```bash
-pip install huggingface_hub   # if not already installed
 python scripts/download_dataset.py
 ```
 

@@ -27,7 +27,7 @@
 
 <!-- [[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0) -->
 
-https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
+https://github.com/user-attachments/assets/3f5f0c48-ff3f-4b9b-985b-59ad0b2ea97c
 
 ## Table of Contents
 

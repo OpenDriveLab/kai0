@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-Download the Kai0 dataset from Hugging Face to the repo's ./data directory.
+Download Kai0 best-model checkpoints from Hugging Face to the repo's ./checkpoints directory.
 
 Run from the repository root:
-    python scripts/download_dataset.py
+    python scripts/download_checkpoints.py
 
 Optional: download only specific tasks or set a custom output path:
-    python scripts/download_dataset.py --tasks FlattenFold HangCloth --local-dir ./my_data
+    python scripts/download_checkpoints.py --tasks FlattenFold HangCloth --local-dir ./my_ckpts
 """
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from multiprocessing import Process
 from pathlib import Path
@@ -28,26 +27,26 @@ def get_repo_root() -> Path:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Download Kai0 dataset from Hugging Face to ./data (or --local-dir)."
+        description="Download Kai0 best-model checkpoints from Hugging Face to ./checkpoints (or --local-dir)."
     )
     parser.add_argument(
         "--local-dir",
         type=str,
         default=None,
-        help="Directory to save the dataset (default: <repo_root>/data)",
+        help="Directory to save checkpoints (default: <repo_root>/checkpoints)",
     )
     parser.add_argument(
         "--tasks",
         nargs="+",
         choices=["FlattenFold", "HangCloth", "TeeShirtSort"],
         default=None,
-        help="Download only these tasks (default: all)",
+        help="Download only these task folders from the repo (default: all)",
     )
     parser.add_argument(
         "--repo-id",
         type=str,
         default="OpenDriveLab-org/Kai0",
-        help="Hugging Face dataset repo id (default: OpenDriveLab-org/Kai0)",
+        help="Hugging Face repo id that hosts best-model checkpoints (default: OpenDriveLab-org/Kai0)",
     )
     args = parser.parse_args()
 
@@ -58,16 +57,16 @@ def main() -> int:
         return 1
 
     repo_root = get_repo_root()
-    local_dir = Path(args.local_dir) if args.local_dir else repo_root / "data"
+    local_dir = Path(args.local_dir) if args.local_dir else repo_root / "checkpoints"
     local_dir = local_dir.resolve()
 
     allow_patterns = None
     if args.tasks:
+        # Each task corresponds to a top-level folder in the repo.
         allow_patterns = [f"{t}/*" for t in args.tasks]
         allow_patterns.append("README.md")
-        allow_patterns.append("meta/*")
 
-    print(f"Downloading dataset to {local_dir}")
+    print(f"Downloading checkpoints to {local_dir}")
     print(f"Repo: {args.repo_id}" + (f", tasks: {args.tasks}" if args.tasks else " (all tasks)"))
 
     # Run snapshot_download in a separate process so Ctrl+C in the main process
@@ -75,7 +74,7 @@ def main() -> int:
     def _worker():
         snapshot_download(
             repo_id=args.repo_id,
-            repo_type="dataset",
+            repo_type="model",
             local_dir=str(local_dir),
             local_dir_use_symlinks=False,
             allow_patterns=allow_patterns,
@@ -88,21 +87,22 @@ def main() -> int:
         proc.join()
     except KeyboardInterrupt:
         print(
-            "\nDownload interrupted by user (Ctrl+C). Terminating download process...",
+            "\nCheckpoint download interrupted by user (Ctrl+C). Terminating download process...",
             file=sys.stderr,
         )
         proc.terminate()
         proc.join()
-        print("Partial data may remain in:", local_dir, file=sys.stderr)
+        print("Partial checkpoint data may remain in:", local_dir, file=sys.stderr)
         return 130
 
     if proc.exitcode != 0:
-        print(f"\nDownload process exited with code {proc.exitcode}", file=sys.stderr)
+        print(f"\nCheckpoint download process exited with code {proc.exitcode}", file=sys.stderr)
         return proc.exitcode or 1
 
-    print(f"\nDone. Dataset is at: {local_dir}")
+    print(f"\nDone. Checkpoints are at: {local_dir}")
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
+

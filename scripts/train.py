@@ -15,6 +15,9 @@ import numpy as np
 import optax
 import tqdm_loggable.auto as tqdm
 import wandb
+import shutil
+from pathlib import Path
+
 
 import openpi.models.model as _model
 import openpi.shared.array_typing as at
@@ -215,6 +218,11 @@ def main(config: _config.TrainConfig):
         overwrite=config.overwrite,
         resume=config.resume,
     )
+    
+    dst_dir = config.checkpoint_dir
+    src_file = Path(config.data.repo_id) / 'norm_stats.json'
+    shutil.copy(src_file, dst_dir)
+
     init_wandb(config, resuming=resuming, enabled=config.wandb_enabled)
 
     data_loader = _data_loader.create_data_loader(
@@ -270,7 +278,7 @@ def main(config: _config.TrainConfig):
         batch = next(data_iter)
 
         if (step % config.save_interval == 0 and step > start_step) or step == config.num_train_steps - 1:
-            _checkpoints.save_state(checkpoint_manager, train_state, data_loader, step)
+            _checkpoints.save_state(checkpoint_manager, train_state, data_loader, step, config.save_train_state)
 
     logging.info("Waiting for checkpoint manager to finish")
     checkpoint_manager.wait_until_finished()

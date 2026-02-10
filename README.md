@@ -1,5 +1,4 @@
-# χ₀: Resource-Aware Robust Manipulation viaTaming Distributional Inconsistencies
-
+# χ₀: Resource-Aware Robust Manipulation via Taming Distributional Inconsistencies
 
 <div id="top" align="center">
 
@@ -16,6 +15,7 @@
 </div>
 
 χ₀ (**kai0**) is a resource-efficient framework for achieving production-level robustness in robotic manipulation by taming distributional inconsistencies.
+<!-- This repository is built on top of [openpi](https://github.com/Physical-Intelligence/openpi), the open-source models and packages for robotics published by the [Physical Intelligence team](https://www.physicalintelligence.company/). -->
 
 χ₀ addresses the systematic distributional shift among the human demonstration distribution ($P_\text{train}$), the inductive bias learned by the policy ($Q_\text{model}$), and the test-time execution distribution ($P_\text{test}$) through three technical modules:
 
@@ -31,7 +31,7 @@ https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
 
 ## Table of Contents
 
-- [Updates](#updates)
+- [Update](#update)
 - [Acknowledgement](#acknowledgement)
 - [Requirements](#requirements)
   - [Compute](#compute)
@@ -75,7 +75,7 @@ This repository is built on top of [openpi](https://github.com/Physical-Intellig
 
 For Model Arithmetic (mixing checkpoints), GPU memory requirements depend on the model size and number of checkpoints being mixed. A single A100 (80GB) is sufficient for most use cases.
 
-The repo has been tested with Ubuntu 22.04.
+Non-edge components (e.g., Policy Training, Model Arithmetic) have been tested on Ubuntu 22.04.
 
 ### Hardware
 
@@ -112,15 +112,28 @@ uv pip install safetensors
 Download the Kai0 dataset so it is available under `./data` for training and evaluation. From the repository root, run:
 
 ```bash
-pip install huggingface_hub   # if not already installed
 python scripts/download_dataset.py
 ```
 
-This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see [DATASET.md](DATASET.md#step-1-download-the-dataset).
+This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see the [dataset docs](docs/dataset.md#step-1-download-the-dataset).
 
 ### 2. Download checkpoints (optional, for testing)
 
-We provide **one best model per task** (FlattenFold, HangCloth, TeeShirtSort) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main). Download the task folder(s) you need and set `weight_loader` in config to the path of the downloaded checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
+We provide **one best model per task** (FlattenFold, HangCloth, TeeShirtSort) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main).
+
+From the repository root, you can download all best-model checkpoints to `./checkpoints` with:
+
+```bash
+python scripts/download_checkpoints.py
+```
+
+To download only specific tasks or use a custom path, run:
+
+```bash
+python scripts/download_checkpoints.py --tasks FlattenFold HangCloth --local-dir ./my_checkpoints
+```
+
+After download, set `weight_loader` in the training config to the path of the corresponding checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
 
 ### 3. Fine-tune with normal π₀.5
 

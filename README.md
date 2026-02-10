@@ -208,9 +208,9 @@ Checkpoints are written to the config’s checkpoint directory. You can then use
 
 - [x] kai0 oracle: training and inference code with non-advantage data of three tasks
 - [x] Model Arithmetic: code of different baselines for weight-space interpolation
-- [ ] Stage Advantage: code, data (advantage labels), and checkpoints — **Feb 12**
-- [ ] HuggingFace & ModelScope: upload Stage Advantage data and checkpoints — **Feb 12**
-- [ ] Train-Deploy Alignment — **Feb 15**
+- [ ] Stage Advantage: code, data (advantage labels), and checkpoints — **Feb 15**
+- [ ] HuggingFace & ModelScope: upload Stage Advantage data and checkpoints — **Feb 14**
+- [ ] Train-Deploy Alignment — **Feb 14**
 
 ## Model Arithmetic
 

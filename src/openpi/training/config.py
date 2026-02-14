@@ -1216,119 +1216,161 @@ _CONFIGS = [
         batch_size=256,
     ),
 
-    #**************************FlattenFold AWBC*******************************
-
-    #**************************TeeShirtSort AWBC*******************************
-    
-    #**************************HangCloth AWBC*******************************
-
-
     #************************Advantage Estimator***************************
-    # TrainConfig(
-    #     name="ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD",
-    #     advantage_estimator=True,
-    #     model=pi0_config.AdvantageEstimatorConfig(
-    #         pi05=True,
-    #         loss_value_weight=1.,
-    #         loss_action_weight=0.,  
-    #         discrete_state_input=False,
-    #     ),
-    #     data=LerobotAgilexDataConfig(
-    #         repo_id = "Path/to/your/advantage/dataset",
-    #         assets=AssetsConfig(
-    #             assets_dir="Path/to/your/advantage/dataset/assets",
-    #             asset_id="Your_advantage_dataset_name",
-    #         ),
-    #         default_prompt="Flatten and fold the cloth.",
-    #         # * why removing "prompt" here will lead to an error in transforms.py
-    #         repack_transforms=_transforms.Group(
-    #             inputs=[
-    #             _transforms.RepackTransform(
-    #                 {
-    #                     "images": {
-    #                         "top_head": "observation.images.top_head",
-    #                         "hand_left": "observation.images.hand_left",
-    #                         "hand_right": "observation.images.hand_right",
-    #                         "his_-100_top_head": "his_-100_observation.images.top_head",
-    #                         "his_-100_hand_left": "his_-100_observation.images.hand_left",
-    #                         "his_-100_hand_right": "his_-100_observation.images.hand_right",
-    #                     },
-    #                     "state": "observation.state",
-    #                     "actions": "action",
-    #                     # "prompt": "prompt",  # ! Not adding this for default prompt.
-    #                     "episode_length": "episode_length",
-    #                     "frame_index": "frame_index",
-    #                     "episode_index": "episode_index",
-    #                     "progress_gt": "progress_gt",
-    #                     "stage_progress_gt": "stage_progress_gt",
-    #                     "progress": "progress",
-    #                     # "is_suboptimal": "is_suboptimal",
-    #                 }
-    #             )
-    #         ]
-    #         )
-    #     ),
-    #     pytorch_weight_path="Path/to/your/pi05_base/checkpoint",
-    #     num_train_steps=100_000,
-    #     keep_period=10000,
-    #     save_interval=10000,
-    #     num_workers=8,
-    #     batch_size=16,  # * 1 gpus
-    #     # batch_size=128, # * 8 gpus
-    #     skip_norm_stats=True,           # *  No norm stats used.
-    # ),
-    # TrainConfig(
-    #     name="ADVANTAGE_TORCH_PI06_FLATTEN_FOLD",
-    #     advantage_estimator=True,
-    #     model=pi0_config.AdvantageEstimatorConfig(
-    #         pi05=True,
-    #         loss_value_weight=1.,
-    #         loss_action_weight=0.,  # No action loss in advantage estimator training
-    #         discrete_state_input=False,  # Not using states into prompt like pi05
-    #     ),
-    #     data=LerobotAgilexDataConfig(
-    #         # repo_id = "/cpfs01/shared/filtered_cut_data/short_sleeve/flatten_fold/v9-3/1022_20_590_v9-3_2000_lerobot",
-    #         repo_id = "Path/to/your/advantage/dataset",
-    #         assets=AssetsConfig(
-    #             assets_dir="Path/to/your/advantage/dataset/assets",
-    #             asset_id="Your_advantage_dataset_name",
-    #         ),
-    #         default_prompt="Flatten and fold the cloth.",
-    #         # * why removing "prompt" here will lead to an error in transforms.py
-    #         repack_transforms=_transforms.Group(
-    #             inputs=[
-    #             _transforms.RepackTransform(
-    #                 {
-    #                     "images": {
-    #                         "top_head": "observation.images.top_head",
-    #                         "hand_left": "observation.images.hand_left",
-    #                         "hand_right": "observation.images.hand_right",
-    #                     },
-    #                     "state": "observation.state",
-    #                     "actions": "action",
-    #                     # "prompt": "prompt",  # No need if default prompt is used.
-    #                     "episode_length": "episode_length",
-    #                     "frame_index": "frame_index",
-    #                     "episode_index": "episode_index",
-    #                     "progress_gt": "progress_gt",
-    #                     "stage_progress_gt": "stage_progress_gt",
-    #                     "progress": "progress",
-    #                     # "is_suboptimal": "is_suboptimal",
-    #                 }
-    #             )
-    #         ]
-    #         )
-    #     ),
-    #     pytorch_weight_path="Path/to/your/pi06_base/checkpoint",
-    #     num_train_steps=100_000,
-    #     keep_period=10000,
-    #     save_interval=10000,
-    #     num_workers=55,
-    #     # batch_size=16,  # * 1 gpus
-    #     batch_size=18*8, # * 8 gpus
-    #     skip_norm_stats=True,           # *  No norm stats used.
-    # ),
+    TrainConfig(
+        name="ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD",
+        advantage_estimator=True,
+        model=pi0_config.AdvantageEstimatorConfig(
+            pi05=True,
+            loss_value_weight=1.,
+            loss_action_weight=0.,  
+            discrete_state_input=False,
+        ),
+        data=LerobotAgilexDataConfig(
+            repo_id = "Path/to/your/advantage/dataset",
+            assets=AssetsConfig(
+                assets_dir="Path/to/your/advantage/dataset/assets",
+                asset_id="Your_advantage_dataset_name",
+            ),
+            default_prompt="Flatten and fold the cloth.",
+            # * why removing "prompt" here will lead to an error in transforms.py
+            repack_transforms=_transforms.Group(
+                inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "images": {
+                            "top_head": "observation.images.top_head",
+                            "hand_left": "observation.images.hand_left",
+                            "hand_right": "observation.images.hand_right",
+                            "his_-100_top_head": "his_-100_observation.images.top_head",
+                            "his_-100_hand_left": "his_-100_observation.images.hand_left",
+                            "his_-100_hand_right": "his_-100_observation.images.hand_right",
+                        },
+                        "state": "observation.state",
+                        "actions": "action",
+                        # "prompt": "prompt",  # ! Not adding this for default prompt.
+                        "episode_length": "episode_length",
+                        "frame_index": "frame_index",
+                        "episode_index": "episode_index",
+                        "progress_gt": "progress_gt",
+                        "stage_progress_gt": "stage_progress_gt",
+                        "progress": "progress",
+                        # "is_suboptimal": "is_suboptimal",
+                    }
+                )
+            ]
+            )
+        ),
+        pytorch_weight_path="Path/to/your/pi05_base/checkpoint",
+        num_train_steps=100_000,
+        keep_period=10000,
+        save_interval=10000,
+        num_workers=8,
+        batch_size=16,  # * 1 gpus
+        # batch_size=128, # * 8 gpus
+        skip_norm_stats=True,           # *  No norm stats used.
+    ),
+    TrainConfig(
+        name="ADVANTAGE_TORCH_PI06_FLATTEN_FOLD",
+        advantage_estimator=True,
+        model=pi0_config.AdvantageEstimatorConfig(
+            pi05=True,
+            loss_value_weight=1.,
+            loss_action_weight=0.,  # No action loss in advantage estimator training
+            discrete_state_input=False,  # Not using states into prompt like pi05
+        ),
+        data=LerobotAgilexDataConfig(
+            # repo_id = "/cpfs01/shared/filtered_cut_data/short_sleeve/flatten_fold/v9-3/1022_20_590_v9-3_2000_lerobot",
+            repo_id = "Path/to/your/advantage/dataset",
+            assets=AssetsConfig(
+                assets_dir="Path/to/your/advantage/dataset/assets",
+                asset_id="Your_advantage_dataset_name",
+            ),
+            default_prompt="Flatten and fold the cloth.",
+            # * why removing "prompt" here will lead to an error in transforms.py
+            repack_transforms=_transforms.Group(
+                inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "images": {
+                            "top_head": "observation.images.top_head",
+                            "hand_left": "observation.images.hand_left",
+                            "hand_right": "observation.images.hand_right",
+                        },
+                        "state": "observation.state",
+                        "actions": "action",
+                        # "prompt": "prompt",  # No need if default prompt is used.
+                        "episode_length": "episode_length",
+                        "frame_index": "frame_index",
+                        "episode_index": "episode_index",
+                        "progress_gt": "progress_gt",
+                        "stage_progress_gt": "stage_progress_gt",
+                        "progress": "progress",
+                        # "is_suboptimal": "is_suboptimal",
+                    }
+                )
+            ]
+            )
+        ),
+        pytorch_weight_path="Path/to/your/pi06_base/checkpoint",
+        num_train_steps=100_000,
+        keep_period=10000,
+        save_interval=10000,
+        num_workers=55,
+        # batch_size=16,  # * 1 gpus
+        batch_size=18*8, # * 8 gpus
+        skip_norm_stats=True,           # *  No norm stats used.
+    ),
     #************************advantage estimator***************************
+
+    #**************************FlattenFold AWBC*******************************
+    TrainConfig(
+        name="pi05_flatten_fold_awbc",
+        model=pi0_config.Pi0Config(pi05=True),
+        data = LerobotAgilexDataConfig(
+            repo_id="<path_to_repo_root>/data/FlattenFold/advantage",
+            default_prompt="Flatten and fold the cloth.",
+            use_delta_joint_actions=False,
+            base_config=DataConfig(prompt_from_task=True),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("/cpfs01/shared/checkpoint/pi05_base/params"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8, 
+        batch_size=256, 
+    ),
+    #**************************TeeShirtSort AWBC*******************************
+    TrainConfig(
+        name="pi05_tee_shirt_sort_awbc",
+        model=pi0_config.Pi0Config(pi05=True),
+        data = LerobotAgilexDataConfig(
+            repo_id="<path_to_repo_root>/data/TeeShirtSort/advantage",
+            default_prompt="Fetch the clothes, fold the tee shirts and hand-over the collared shirts.",
+            use_delta_joint_actions=False,
+            base_config=DataConfig(prompt_from_task=True),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("<path/to/pi05_base/checkpoint>"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8,
+        batch_size=256,
+    ),
+    #**************************HangCloth AWBC*******************************
+    TrainConfig(
+        name="pi05_hang_cloth_awbc",
+        model=pi0_config.Pi0Config(pi05=True),
+        data = LerobotARXDataConfig(
+            repo_id="<path_to_repo_root>/data/HangCloth/advantage",
+            default_prompt="Fetch and hang the cloth.",
+            use_delta_joint_actions=False,
+            base_config=DataConfig(prompt_from_task=True),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("/cpfs01/shared/checkpoint/pi05_base/params"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8, 
+        batch_size=256, 
+    ),
     # RoboArena & PolaRiS configs.
     *roboarena_config.get_roboarena_configs(),
     *polaris_config.get_polaris_configs(),

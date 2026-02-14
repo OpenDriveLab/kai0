@@ -20,7 +20,7 @@
 χ₀ addresses the systematic distributional shift among the human demonstration distribution ($P_\text{train}$), the inductive bias learned by the policy ($Q_\text{model}$), and the test-time execution distribution ($P_\text{test}$) through three technical modules:
 
 - **[Model Arithmetic](#model-arithmetic)**: A weight-space merging strategy that combines models trained on different data subsets, efficiently capturing diverse knowledge without architectural complexity. **[Released]**
-- **[Stage Advantage](#stage-advantage-coming-soon)**: A stage-aware advantage estimator that provides stable, dense progress signals for policy training. **[Coming Soon]**
+- **[Stage Advantage](#stage-advantage)**: A stage-aware advantage estimator that provides stable, dense progress signals for policy training. **[Released]**
 - **[Train-Deploy Alignment](#train-deploy-alignment-coming-soon)**: Bridges the distribution gap via spatio-temporal augmentation, heuristic DAgger corrections, and temporal chunk-wise smoothing. **[Coming Soon]**
 
 χ₀ enables two sets of dual-arm robots to collaboratively orchestrate long-horizon garment manipulation — flattening, folding, and hanging — surpassing the state-of-the-art $\pi_{0.5}$ baseline by approximately 250% in success rate, with `only 20 hours of data and 8 A100 GPUs`.
@@ -46,7 +46,7 @@ https://github.com/user-attachments/assets/3f5f0c48-ff3f-4b9b-985b-59ad0b2ea97c
 - [Model Arithmetic](#model-arithmetic)
   - [Workflow](#workflow)
   - [Quick Start](#quick-start)
-- [Stage Advantage (Coming Soon)](#stage-advantage-coming-soon)
+- [Stage Advantage](#stage-advantage)
 - [Train-Deploy Alignment (Coming Soon)](#train-deploy-alignment-coming-soon)
 - [Citation](#licenseandcitation)
 - [Troubleshooting](#troubleshooting)
@@ -54,6 +54,7 @@ https://github.com/user-attachments/assets/3f5f0c48-ff3f-4b9b-985b-59ad0b2ea97c
 
 ## Update
 
+- [Feb 14 2026] Release of the **Stage Advantage** module: advantage estimator training, evaluation, GT labeling, and AWBC training pipeline.
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
 - [Feb 10 2026] χ₀ paper released.
 
@@ -208,9 +209,9 @@ Checkpoints are written to the config’s checkpoint directory. You can then use
 
 - [x] kai0 oracle: training and inference code with non-advantage data of three tasks
 - [x] Model Arithmetic: code of different baselines for weight-space interpolation
-- [ ] Stage Advantage: code, data (advantage labels), and checkpoints — **Feb 12**
-- [ ] HuggingFace & ModelScope: upload Stage Advantage data and checkpoints — **Feb 12**
-- [ ] Train-Deploy Alignment — **Feb 15**
+- [x] Stage Advantage: code, data (advantage labels), and checkpoints
+- [ ] HuggingFace & ModelScope: upload Stage Advantage data and checkpoints — **Feb 14**
+- [ ] Train-Deploy Alignment — **Feb 14**
 
 ## Model Arithmetic
 
@@ -265,11 +266,54 @@ python model_arithmetic/arithmetic_torch.py \
 
 For gradient-based optimization, dataset splitting, and all other methods, see the full documentation in [`model_arithmetic/README.md`](model_arithmetic/README.md).
 
-## Stage Advantage (Coming Soon)
+## Stage Advantage
 
 Stage Advantage decomposes long-horizon tasks into semantic stages and provides stage-aware advantage signals for policy training. It addresses the numerical instability of prior non-stage approaches by computing advantage as progress differentials within each stage, yielding smoother and more stable supervision.
 
-**This module is currently under refinement and will be released soon.**
+The full pipeline has four stages:
+
+```
+Stage 0: GT Labeling  →  Stage 1: Train Advantage Estimator  →  Stage 2: Advantage Estimation  →  Stage 3: AWBC Training
+```
+
+### Quick Start
+
+**Stage 0 — GT Data Labeling**: Compute advantage values and discretize into `task_index` labels.
+
+```bash
+cd stage_advantage/annotation
+python gt_label.py <dataset_path> \
+    --threshold 30 --chunk-size 50 --discretion-type binary \
+    --advantage-source absolute_advantage
+```
+
+For batch labeling across multiple dataset variants, see `stage_advantage/annotation/gt_labeling.sh`.
+
+**Stage 1 — Train Advantage Estimator**: Fine-tune a pi0-based model to predict advantage from observations.
+
+```bash
+uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_name=run1 --save_interval 10000
+```
+
+For a ready-to-use script with environment setup (conda/venv activation, DDP configuration) and automatic log management, see `stage_advantage/annotation/train_estimator.sh`.
+
+**Stage 2 — Advantage Estimation on New Data**: Use the trained estimator to label datasets with predicted advantage values.
+
+```bash
+uv run python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/dataset
+```
+
+For a ready-to-use script with environment setup and status logging, see `stage_advantage/annotation/eval.sh`.
+
+**Stage 3 — AWBC Training**: Train a policy with Advantage-Weighted Behavior Cloning.
+
+```bash
+XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_awbc --exp_name=run1
+```
+
+For a ready-to-use script with environment setup and automatic log management, see `stage_advantage/awbc/train_awbc.sh`.
+
+For the full pipeline details, configuration instructions, and all parameters, see [`stage_advantage/README.md`](stage_advantage/README.md).
 
 ## Train-Deploy Alignment (Coming Soon)
 

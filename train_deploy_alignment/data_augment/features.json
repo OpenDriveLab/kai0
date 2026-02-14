@@ -1,0 +1,66 @@
+{
+  "observation.images.top_head": {
+    "dtype": "video",
+    "shape": [480, 640, 3],
+    "names": ["height", "width", "channel"],
+    "video_info": {
+      "video.fps": 30.0,
+      "video.codec": "av1",
+      "video.pix_fmt": "yuv420p",
+      "video.is_depth_map": false,
+      "has_audio": false
+    }
+  },
+  "observation.images.hand_left": {
+    "dtype": "video",
+    "shape": [480, 640, 3],
+    "names": ["height", "width", "channel"],
+    "video_info": {
+      "video.fps": 30.0,
+      "video.codec": "av1",
+      "video.pix_fmt": "yuv420p",
+      "video.is_depth_map": false,
+      "has_audio": false
+    }
+  },
+  "observation.images.hand_right": {
+    "dtype": "video",
+    "shape": [480, 640, 3],
+    "names": ["height", "width", "channel"],
+    "video_info": {
+      "video.fps": 30.0,
+      "video.codec": "av1",
+      "video.pix_fmt": "yuv420p",
+      "video.is_depth_map": false,
+      "has_audio": false
+    }
+  },
+  "observation.state": {
+    "dtype": "float32",
+    "shape": [1, 14]
+  },
+  "action": {
+    "dtype": "float32",
+    "shape": [1, 14]
+  },
+  "episode_index": {
+    "dtype": "int64",
+    "shape": [1],
+    "names": null
+  },
+  "frame_index": {
+    "dtype": "int64",
+    "shape": [1],
+    "names": null
+  },
+  "index": {
+    "dtype": "int64",
+    "shape": [1],
+    "names": null
+  },
+  "task_index": {
+    "dtype": "int64",
+    "shape": [1],
+    "names": null
+  }
+}

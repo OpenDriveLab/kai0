@@ -52,8 +52,8 @@ class AgilexInputs(transforms.DataTransformFn):
     mask_state: bool = False
 
     def __call__(self, data: dict) -> dict:
-        # We only mask padding for pi0 model, not pi0-FAST
-        mask_padding = self.model_type == _model.ModelType.PI0
+        # We only mask padding for pi0/pi0_rtc model, not pi05/pi05_rtc or pi0-FAST
+        mask_padding = self.model_type in (_model.ModelType.PI0, _model.ModelType.PI0_RTC)
 
         in_images = data["images"]
 

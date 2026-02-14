@@ -17,7 +17,11 @@ Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’
 ## Prerequisites
 
 1. **Advantage dataset**  
-   The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`). To build it:
+   The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`).
+
+   **Pre-annotated data:** The downloaded dataset includes **`data/Task_A/advantage`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (no need to run Stage 0–2 first). Set the AWBC config `repo_id` to that path and run the training commands below.
+
+   To build your own advantage dataset instead:
    - Run **Stage 2** (eval) on your dataset → get `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns.
    - Run **Stage 0** on that output: `gt_label.py --advantage-source absolute_advantage` (or `gt_labeling.sh` with `DATA_PATH` = the eval repo). The resulting directory (with `data/`, `meta/tasks.jsonl`, `videos/`) is your advantage dataset.
    - Place or link it at e.g. `./data/FlattenFold/advantage` and set `repo_id` in config to that path.

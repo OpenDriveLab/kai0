@@ -1,0 +1,60 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from arm_control/msg/PosCmd.msg
+// generated code does not contain a copyright notice
+
+
+module arm_control {
+  module msg {
+    typedef double double__6[6];
+    typedef int32 int32__6[6];
+    struct PosCmd {
+      double x;
+
+      double y;
+
+      double z;
+
+      double roll;
+
+      double pitch;
+
+      double yaw;
+
+      double gripper;
+
+      double quater_x;
+
+      double quater_y;
+
+      double quater_z;
+
+      double quater_w;
+
+      double chx;
+
+      double chy;
+
+      double chz;
+
+      double vel_l;
+
+      double vel_r;
+
+      double height;
+
+      double head_pit;
+
+      double head_yaw;
+
+      double__6 temp_float_data;
+
+      int32__6 temp_int_data;
+
+      int32 mode1;
+
+      int32 mode2;
+
+      int32 time_count;
+    };
+  };
+};

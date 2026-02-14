@@ -1,0 +1,22 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from arm_control/msg/ArxImu.msg
+// generated code does not contain a copyright notice
+
+#include "builtin_interfaces/msg/Time.idl"
+#include "geometry_msgs/msg/Vector3.idl"
+
+module arm_control {
+  module msg {
+    struct ArxImu {
+      builtin_interfaces::msg::Time stamp;
+
+      double roll;
+
+      double pitch;
+
+      double yaw;
+
+      geometry_msgs::msg::Vector3 angular_velocity;
+    };
+  };
+};

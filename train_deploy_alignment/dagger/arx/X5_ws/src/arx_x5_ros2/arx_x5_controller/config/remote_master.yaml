@@ -1,0 +1,16 @@
+/arm_master_l:
+  ros__parameters:
+    arm_can_id: can0
+    arm_control_type: remote_master
+    arm_pub_topic_name: arm_master_l_status
+    arm_sub_topic_name: arm_master_l_cmd
+    arm_end_type: 1
+
+/arm_master_r:
+  ros__parameters:
+    arm_can_id: can2
+    arm_control_type: remote_master
+    arm_pub_topic_name: arm_master_r_status
+    arm_sub_topic_name: arm_master_r_cmd
+    arm_end_type: 1
+

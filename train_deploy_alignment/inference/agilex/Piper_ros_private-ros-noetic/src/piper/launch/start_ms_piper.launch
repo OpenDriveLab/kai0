@@ -1,0 +1,27 @@
+<launch>
+  <!-- mode，default is 0, which reads the info from the lead and send to follower through ROS -->
+  <arg name="mode" default="0" />
+  <arg name="auto_enable" default="true" />
+  <!-- launch the left arm node -->
+    <node name="$(anon piper_left)" pkg="piper" type="piper_start_ms_node.py" output="screen">
+      <param name="can_port" value="can_left" />
+      <param name="mode" value="$(arg mode)" />
+      <param name="auto_enable" value="$(arg auto_enable)" />
+      <remap from="/puppet/joint_states" to="/puppet/joint_left" />
+      <remap from="/master/joint_states" to="/master/joint_left" />
+      <remap from="/puppet/end_pose" to="/puppet/end_pose_left" />
+      <remap from="pos_cmd" to="/control/end_pose_left" />
+    </node>
+
+  <!-- launch the right arm node -->
+    <node name="$(anon piper_right)" pkg="piper" type="piper_start_ms_node.py" output="screen">
+      <param name="can_port" value="can_right" />
+      <param name="mode" value="$(arg mode)" />
+      <param name="auto_enable" value="$(arg auto_enable)" />
+      <remap from="/puppet/joint_states" to="/puppet/joint_right" />
+      <remap from="/master/joint_states" to="/master/joint_right" />
+      <remap from="/puppet/end_pose" to="/puppet/end_pose_right" />
+      <remap from="pos_cmd" to="/control/end_pose_right" />
+    </node>
+</launch>
+

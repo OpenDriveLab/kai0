@@ -1,0 +1,4 @@
+source;share/arx5_arm_msg/environment/ament_prefix_path.sh
+source;share/arx5_arm_msg/environment/library_path.sh
+source;share/arx5_arm_msg/environment/path.sh
+source;share/arx5_arm_msg/environment/pythonpath.sh

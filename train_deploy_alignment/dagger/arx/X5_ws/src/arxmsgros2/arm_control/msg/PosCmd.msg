@@ -1,0 +1,25 @@
+float64 x
+float64 y
+float64 z
+float64 roll
+float64 pitch
+float64 yaw
+float64 gripper
+float64 quater_x
+float64 quater_y
+float64 quater_z
+float64 quater_w
+float64 chx
+float64 chy
+float64 chz
+float64 vel_l
+float64 vel_r
+float64 height
+float64 head_pit
+float64 head_yaw
+float64[6] temp_float_data
+int32[6] temp_int_data
+int32 mode1
+int32 mode2
+int32 time_count
+

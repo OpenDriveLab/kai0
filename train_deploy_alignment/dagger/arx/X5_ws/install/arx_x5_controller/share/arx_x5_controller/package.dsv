@@ -1,0 +1,11 @@
+source;share/arx_x5_controller/hook/cmake_prefix_path.ps1
+source;share/arx_x5_controller/hook/cmake_prefix_path.dsv
+source;share/arx_x5_controller/hook/cmake_prefix_path.sh
+source;share/arx_x5_controller/hook/ld_library_path_lib.ps1
+source;share/arx_x5_controller/hook/ld_library_path_lib.dsv
+source;share/arx_x5_controller/hook/ld_library_path_lib.sh
+source;share/arx_x5_controller/local_setup.bash
+source;share/arx_x5_controller/local_setup.dsv
+source;share/arx_x5_controller/local_setup.ps1
+source;share/arx_x5_controller/local_setup.sh
+source;share/arx_x5_controller/local_setup.zsh

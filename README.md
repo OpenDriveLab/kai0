@@ -1,4 +1,4 @@
-# χ₀: Resource-Aware Robust Manipulation via Taming Distributional Inconsistencies
+# χ₀
 
 <div id="top" align="center">
 
@@ -27,7 +27,7 @@
 
 <!-- [[Paper]](https://github.com/OpenDriveLab/kai0) [[Blog]](https://mmlab.hk/research/kai0) -->
 
-https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
+https://github.com/user-attachments/assets/3f5f0c48-ff3f-4b9b-985b-59ad0b2ea97c
 
 ## Table of Contents
 
@@ -40,7 +40,7 @@ https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
 - [Preparation](#preparation)
   - [1. Download the dataset](#1-download-the-dataset)
   - [2. Download checkpoints (optional, for testing)](#2-download-checkpoints-optional-for-testing)
-  - [3. Fine-tune with normal π₀.5](#3-fine-tune-with-normal-π₀5)
+  - [3. Fine-tune with normal π₀.₅](#3-fine-tune-with-normal-π₀.₅)
 - [Project Overview](#project-overview)
 - [Modules Overview and To-Do List](#modules-overview-and-to-do-list)
 - [Model Arithmetic](#model-arithmetic)
@@ -55,7 +55,7 @@ https://github.com/user-attachments/assets/e662f096-d273-4458-abd4-e12b9685a9bc
 ## Update
 
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
-- [Feb 10 2025] χ₀ paper released.
+- [Feb 10 2026] χ₀ paper released.
 
 ## Acknowledgement
 
@@ -135,16 +135,16 @@ python scripts/download_checkpoints.py --tasks FlattenFold HangCloth --local-dir
 
 After download, set `weight_loader` in the training config to the path of the corresponding checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
 
-### 3. Fine-tune with normal π₀.5
+### 3. Fine-tune with normal π₀.₅
 
-After the dataset is in `./data`, you can run **normal π₀.5 full fine-tuning** on it, then use the resulting checkpoints for [Model Arithmetic](#model-arithmetic).
+After the dataset is in `./data`, you can run **normal π₀.₅ full fine-tuning** on it, then use the resulting checkpoints for [Model Arithmetic](#model-arithmetic).
 
 **Set paths in config**
 
 Edit [`src/openpi/training/config.py`](src/openpi/training/config.py) (around lines 1173–1226) for the task(s) you need:
 
 - **`repo_id`**: set to the **absolute path** to the dataset subset, e.g. `<path_to_repo_root>/data/FlattenFold/base`, `<path_to_repo_root>/data/TeeShirtSort/base`, or `<path_to_repo_root>/data/HangCloth/base`.
-- **`weight_loader`**: set to the path of your **π₀.5 base checkpoint** — either the best model you downloaded in step 2 above, or openpi’s pretrained π₀.5 checkpoint.
+- **`weight_loader`**: set to the path of your **π₀.₅ base checkpoint** — either the best model you downloaded in step 2 above, or openpi’s pretrained π₀.₅ checkpoint.
 
 Config names to use: e.g. `pi05_flatten_fold_normal`
 
@@ -286,7 +286,7 @@ All assets and code in this repository are under the Apache 2.0 license unless s
 
 ```bibtex
 @article{sima2026kai0,
-  title={χ₀: Resource-Aware Robust Manipulation via Taming Distributional Inconsistencies},
+  title={$\chi_{0}$: Resource-Aware Robust Manipulation via Taming Distributional Inconsistencies},
   author={Yu, Checheng and Sima, Chonghao and Jiang, Gangcheng and Zhang, Hai and Mai, Haoguang and Li, Hongyang and Wang, Huijie and Chen, Jin and Wu, Kaiyang and Chen, Li and Zhao, Lirui and Shi, Modi and Luo, Ping and Bu, Qingwen and Peng, Shijia and Li, Tianyu and Yuan, Yibo},
   journal={arXiv preprint arXiv:2602.09021},
   year={2026}

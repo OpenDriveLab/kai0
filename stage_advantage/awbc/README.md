@@ -19,7 +19,7 @@ Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’
 1. **Advantage dataset**  
    The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`).
 
-   **Pre-annotated data:** The downloaded dataset includes **`data/Task_A/advantage`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (no need to run Stage 0–2 first). Set the AWBC config `repo_id` to that path and run the training commands below.
+   **Pre-annotated data:** The released dataset includes **`Task_A/advantage/`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (no need to run Stage 0–2 first). It is available in both the [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0) dataset repos. After downloading, set the AWBC config `repo_id` to the local path (e.g. `<repo_root>/data/Task_A/advantage`) and run the training commands below.
 
    To build your own advantage dataset instead:
    - Run **Stage 2** (eval) on your dataset → get `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns.

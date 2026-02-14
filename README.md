@@ -54,6 +54,7 @@ https://github.com/user-attachments/assets/3f5f0c48-ff3f-4b9b-985b-59ad0b2ea97c
 
 ## Update
 
+- [Feb 15 2026] Stage Advantage **advantage labels** (`Task_A/advantage/`) released on [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0).
 - [Feb 15 2026] Release of the **Train-Deploy Alignment** module: data augmentation (time scaling, space mirroring), DAgger data collection, inference with temporal smoothing/ensembling and RTC, and HDF5-to-LeRobot conversion.
 - [Feb 14 2026] Release of the **Stage Advantage** module: advantage estimator training, evaluation, GT labeling, and AWBC training pipeline.
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
@@ -212,7 +213,7 @@ Checkpoints are written to the config’s checkpoint directory. You can then use
 - [x] Model Arithmetic: code of different baselines for weight-space interpolation
 - [x] Stage Advantage: code, data (advantage labels), and checkpoints
 - [x] Train-Deploy Alignment: data augmentation, DAgger, inference (temporal smoothing, ensembling, RTC)
-- [ ] HuggingFace & ModelScope: upload Stage Advantage data and checkpoints
+- [x] HuggingFace & ModelScope: Stage Advantage data (`Task_A/advantage/`) and checkpoints uploaded
 
 ## Model Arithmetic
 

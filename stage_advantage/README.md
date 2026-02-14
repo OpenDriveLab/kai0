@@ -22,7 +22,7 @@ This module implements a pipeline for training an **Advantage Estimator** and us
 
 **End-to-end order for AWBC:** (1) Stage 0 on data with `progress` → optional for Stage 1. (2) Stage 1 → train estimator. (3) Stage 2 → run eval on your dataset so it gets `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns. (4) Run Stage 0 again with `--advantage-source absolute_advantage` on that dataset (e.g. via `gt_labeling.sh` with `DATA_PATH` = the repo you ran eval on, and source subdirs `data_PI06_100000` / `data_KAI0_100000`). (5) Point AWBC config `repo_id` at the resulting advantage-labeled directory and run Stage 3 training.
 
-**Pre-annotated data:** The downloaded dataset includes **`data/Task_A/advantage`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (Stage 3) without running Stage 0–2. Set the AWBC config `repo_id` to that path and run training.
+**Pre-annotated data:** The released dataset includes **`Task_A/advantage/`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (Stage 3) without running Stage 0–2. It is available in both the [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0) dataset repos. After downloading (e.g. via `scripts/download_dataset.py`), set the AWBC config `repo_id` to the local path (e.g. `<repo_root>/data/Task_A/advantage`) and run training.
 
 ---
 

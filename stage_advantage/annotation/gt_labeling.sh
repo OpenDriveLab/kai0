@@ -55,11 +55,12 @@ prepare_and_label() {
 }
 
 # ─── Dataset variants (only PI06 and KAI0) ─────────────────────────────────────
-# PI06: single-timestep / timeline-style labeling (1 stage)
-prepare_and_label "data_1T_TL_100000" "${base_name}_PI06_binary" ""
+# Source subdirs must match Stage 2 (eval) output: data_PI06_100000 / data_KAI0_100000
+# PI06: single-timestep labeling (1 stage)
+prepare_and_label "data_PI06_100000" "${base_name}_PI06_binary" ""
 
 # KAI0: two-stage, stage-level labeling
-prepare_and_label "data_2T_SL_100000" "${base_name}_KAI0_abs_binary" "--stage-nums 2"
+prepare_and_label "data_KAI0_100000" "${base_name}_KAI0_abs_binary" "--stage-nums 2"
 
 echo "============================================================"
 echo "  All datasets labeled successfully!"

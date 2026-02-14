@@ -1,36 +1,40 @@
 # Stage Advantage Pipeline
 
-This module implements a two-stage pipeline for training an **Advantage Estimator** and using it in **Advantage-Weighted Behavior Cloning (AWBC)**.
+This module implements a pipeline for training an **Advantage Estimator** and using it in **Advantage-Weighted Behavior Cloning (AWBC)**.
 
 ## Pipeline Overview
 
 ```
  ┌──────────────────────────────────────────────────────────────────────────┐
  │  Stage 0: GT Labeling (annotation/gt_labeling.sh + gt_label.py)         │
- │  Compute advantage from progress and assign task_index labels           │
+ │  Compute advantage (from progress or from Stage 2 output) → task_index   │
  ├──────────────────────────────────────────────────────────────────────────┤
  │  Stage 1: Train Advantage Estimator (annotation/train_estimator.sh)     │
- │  Fine-tune pi0 model to predict advantage from observations             │
+ │  Fine-tune pi0 model to predict advantage from observations              │
  ├──────────────────────────────────────────────────────────────────────────┤
- │  Stage 2: Advantage Estimation on New Data (annotation/eval.py)         │
- │  Use trained estimator to label new datasets with advantage values      │
+ │  Stage 2: Advantage Estimation on New Data (annotation/eval.py)          │
+ │  Use trained estimator → parquets with data_PI06_* / data_KAI0_*         │
  ├──────────────────────────────────────────────────────────────────────────┤
- │  Stage 3: AWBC Training (awbc/train_awbc.sh)                            │
- │  Train policy with advantage-weighted behavior cloning                   │
+ │  Stage 3: AWBC Training (scripts/train.py pi05_*_awbc)                   │
+ │  Train policy with advantage-weighted behavior cloning (prompt_from_task) │
  └──────────────────────────────────────────────────────────────────────────┘
 ```
+
+**End-to-end order for AWBC:** (1) Stage 0 on data with `progress` → optional for Stage 1. (2) Stage 1 → train estimator. (3) Stage 2 → run eval on your dataset so it gets `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns. (4) Run Stage 0 again with `--advantage-source absolute_advantage` on that dataset (e.g. via `gt_labeling.sh` with `DATA_PATH` = the repo you ran eval on, and source subdirs `data_PI06_100000` / `data_KAI0_100000`). (5) Point AWBC config `repo_id` at the resulting advantage-labeled directory and run Stage 3 training.
 
 ---
 
 ## Stage 0: GT Data Labeling
 
-**Goal**: Compute advantage values from raw trajectory progress and label each frame with a discretized `task_index`.
+**Goal**: Compute advantage values (from `progress` or from Stage 2’s `absolute_advantage`) and label each frame with a discretized `task_index`; write `meta/tasks.jsonl` (prompt strings per `task_index`).
 
 **Script**: `annotation/gt_labeling.sh` (calls `annotation/gt_label.py`)
 
+**For AWBC:** Run Stage 2 (eval) first so the dataset has `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns. Then run Stage 0 with `--advantage-source absolute_advantage` on that output (e.g. set `gt_labeling.sh`’s `DATA_PATH` to the eval repo and use source subdirs `data_PI06_100000` / `data_KAI0_100000`; the script copies them into the target’s `data/` and runs `gt_label.py`).
+
 ### How it works
 
-1. **Prepare dataset directory**: Copy/link the raw dataset (parquet + videos + meta) into a new working directory with standard LeRobot layout.
+1. **Prepare dataset directory**: Copy/link the source (parquet + videos + meta) into a new working directory with standard LeRobot layout. For AWBC, the source parquets are the Stage 2 output (with `absolute_advantage`).
 2. **Compute advantage**: For each frame `i`, the advantage is defined as:
    ```
    advantage[i] = progress[i + chunk_size] - progress[i]
@@ -276,9 +280,9 @@ At **inference** time you must use the **same prompt format** as in training. To
 
 ### Before training
 
-1. Produce the advantage dataset (Stage 0 + Stage 2) and place it at e.g. `./data/FlattenFold/advantage`.
-2. In `config.py`, set **`repo_id`** to that path and **`weight_loader`** to your π₀.5 base checkpoint for the three AWBC configs you use.
-3. Compute norm stats:  
+1. **Produce the advantage dataset:** Run Stage 2 (eval) on your dataset so it has `data_PI06_100000/` or `data_KAI0_100000/`. Then run Stage 0 (e.g. `gt_labeling.sh`) with `DATA_PATH` = that repo and source subdirs `data_PI06_100000` / `data_KAI0_100000`; the script outputs a directory with `data/` (parquets with `task_index`), `meta/tasks.jsonl`, and `videos`. Use that directory as the advantage dataset (e.g. copy or link it to `./data/FlattenFold/advantage`).
+2. In `config.py`, set **`repo_id`** to that advantage dataset path and **`weight_loader`** to your π₀.5 base checkpoint for the AWBC config(s) you use.
+3. **Compute norm stats:**  
    `uv run python scripts/compute_norm_states_fast.py --config-name pi05_flatten_fold_awbc`  
    (and similarly for `pi05_tee_shirt_sort_awbc` / `pi05_hang_cloth_awbc` if needed.)
 

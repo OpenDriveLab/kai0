@@ -9,7 +9,7 @@ This module implements a pipeline for training an **Advantage Estimator** and us
  │  Stage 0: GT Labeling (annotation/gt_labeling.sh + gt_label.py)         │
  │  Compute advantage (from progress or from Stage 2 output) → task_index   │
  ├──────────────────────────────────────────────────────────────────────────┤
- │  Stage 1: Train Advantage Estimator (annotation/train_estimator.sh)     │
+ │  Stage 1: Train Advantage Estimator (scripts/train_pytorch.py)           │
  │  Fine-tune pi0 model to predict advantage from observations              │
  ├──────────────────────────────────────────────────────────────────────────┤
  │  Stage 2: Advantage Estimation on New Data (annotation/eval.py)          │
@@ -103,8 +103,6 @@ See `gt_labeling.sh` for batch labeling examples across multiple dataset variant
 
 **Goal**: Fine-tune a pi0-based model to predict advantage values from observations (images + state), producing a learned Advantage Estimator.
 
-**Script**: `annotation/train_estimator.sh`
-
 **Configs**: `ADVANTAGE_TORCH_PI06_FLATTEN_FOLD` or `ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD` (defined in `src/openpi/training/config.py`)
 
 ### How it works
@@ -143,34 +141,27 @@ TrainConfig(
 
 ### Usage
 
+From the **repository root**:
+
 ```bash
 # Single GPU (KAI0 or PI06)
-RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 \
-    bash stage_advantage/annotation/train_estimator.sh
-RUNNAME=ADVANTAGE_TORCH_PI06_FLATTEN_FOLD RUNTIME=run1 \
-    bash stage_advantage/annotation/train_estimator.sh
+uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_name=run1 --save_interval 10000
+uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_PI06_FLATTEN_FOLD --exp_name=run1 --save_interval 10000
 
-# Multi-GPU (8 GPUs on a single node)
-RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 NPROC_PER_NODE=8 \
-    bash stage_advantage/annotation/train_estimator.sh
+# Multi-GPU (e.g. 8 GPUs on one node)
+uv run torchrun --standalone --nproc_per_node=8 scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD \
+    --exp_name=run1 --save_interval 10000
 
-# Multi-Node (2 nodes x 8 GPUs)
-# On node 0 (master):
-RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 \
-    WORLD_SIZE=2 RANK=0 NPROC_PER_NODE=8 \
-    MASTER_ADDR=<master_ip> MASTER_PORT=12345 \
-    bash stage_advantage/annotation/train_estimator.sh
+# Multi-node (e.g. 2 nodes × 8 GPUs): on master node set WORLD_SIZE=2, RANK=0, MASTER_ADDR, MASTER_PORT;
+# on worker set RANK=1, then:
+uv run torchrun --nnodes=2 --nproc_per_node=8 --node_rank=$RANK --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+    scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_name=run1 --save_interval 10000
 
-# On node 1:
-RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 \
-    WORLD_SIZE=2 RANK=1 NPROC_PER_NODE=8 \
-    MASTER_ADDR=<master_ip> MASTER_PORT=12345 \
-    bash stage_advantage/annotation/train_estimator.sh
-
-# Resume from a previous checkpoint
-RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 RESUME=1 \
-    bash stage_advantage/annotation/train_estimator.sh
+# Resume from latest checkpoint
+uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_name=run1 --resume
 ```
+
+Logs and checkpoints go to `experiment/<config_name>/` and `experiment/<config_name>/log/<exp_name>.log`. Redirect to a log file if desired, e.g. `2>&1 | tee experiment/ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD/log/run1.log`.
 
 ### Training Outputs
 
@@ -194,7 +185,7 @@ experiment/ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD/   # or ADVANTAGE_TORCH_PI06_FLATTE
 
 **Goal**: Use the trained Advantage Estimator to label new/unseen datasets with predicted advantage values.
 
-**Script**: `annotation/eval.sh` (calls `annotation/eval.py`, which uses `annotation/evaluator.py`)
+**Script**: `annotation/eval.py` (uses `annotation/evaluator.py`)
 
 ### How it works
 
@@ -221,16 +212,23 @@ experiment/ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD/   # or ADVANTAGE_TORCH_PI06_FLATTE
 
 ### Usage
 
+From the **repository root** (or ensure Python can import the project and paths are correct):
+
 ```bash
-# Evaluate using the Flatten-Fold KAI0 model on a dataset
-bash stage_advantage/annotation/eval.sh Flatten-Fold KAI0 /path/to/dataset
-
-# Evaluate using the PI06 model
-bash stage_advantage/annotation/eval.sh Flatten-Fold PI06 /path/to/dataset
-
-# Or call eval.py directly
-python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/dataset
+uv run python stage_advantage/annotation/eval.py <model_type> <model_name> <repo_id>
 ```
+
+Examples:
+
+```bash
+# KAI0 (two-timestep) on a dataset
+uv run python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/dataset
+
+# PI06 (single-timestep)
+uv run python stage_advantage/annotation/eval.py Flatten-Fold PI06 /path/to/dataset
+```
+
+`<model_type>` is a key in `eval.py`’s `MODELS_CONFIG_MAP` (e.g. `Flatten-Fold`); `<model_name>` is `PI06` or `KAI0`; `<repo_id>` is the path to the LeRobot dataset. Results are written under `<repo_id>/data_<model_name>_<ckpt_steps>/`.
 
 ### Evaluation Outputs
 
@@ -306,12 +304,9 @@ stage_advantage/
 ├── annotation/                        # Stages 0–2: labeling & estimator training
 │   ├── README.md
 │   ├── gt_label.py                    # Core labeling script (progress → advantage → task_index)
-│   ├── gt_labeling.sh                 # Batch labeling for PI06 / KAI0 variants
-│   ├── train_estimator.sh             # Training script for the Advantage Estimator
+│   ├── gt_labeling.sh                 # Batch labeling for PI06 / KAI0 variants (only .sh kept here)
 │   ├── eval.py                        # Evaluate trained estimator on datasets
-│   ├── eval.sh                        # Shell wrapper for eval.py
 │   └── evaluator.py                   # SimpleValueEvaluator: batched GPU inference
-└── awbc/                              # Stage 3: AWBC (see Usage above; optional train_awbc.sh)
-    ├── README.md
-    └── train_awbc.sh
+└── awbc/                              # Stage 3: AWBC (commands in README)
+    └── README.md
 ```

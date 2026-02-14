@@ -1,6 +1,6 @@
 # Stage 3: AWBC (Advantage-Weighted Behavior Cloning)
 
-Train a policy on **advantage-labeled** data so that the prompt conditions the policy on the advantage bin (e.g. high vs low advantage). This is implemented by setting **`prompt_from_task=True`** in the data config: each sample’s `task_index` is mapped to a prompt string via `meta/tasks.jsonl`, and that prompt is fed to the policy as language conditioning.
+Train a policy on **advantage-labeled** data so that the prompt conditions the policy on the advantage bin (e.g. high vs low advantage). This is implemented by setting **`prompt_from_task=True`** in the data config: each sample’s `task_index` is mapped to a prompt string via `meta/tasks.jsonl`, and that prompt is fed to the policy as language conditioning. Full pipeline (Stage 0 → 1 → 2 → 0 → 3) is in the [parent README](../README.md).
 
 ## Configs
 
@@ -16,11 +16,11 @@ Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’
 
 ## Prerequisites
 
-1. **Stage 0 + Stage 2**  
-   Produce an advantage-labeled LeRobot dataset:
-   - Run the Advantage Estimator (Stage 2) on your data to get parquets with `absolute_advantage` (and optionally `relative_advantage`).
-   - Run `gt_label.py` with `--advantage-source absolute_advantage` (and e.g. `--stage-nums 2` for KAI0) to compute `task_index` and write `meta/tasks.jsonl`.
-   - Place that dataset under e.g. `./data/FlattenFold/advantage` (or your chosen path).
+1. **Advantage dataset**  
+   The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`). To build it:
+   - Run **Stage 2** (eval) on your dataset → get `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns.
+   - Run **Stage 0** on that output: `gt_label.py --advantage-source absolute_advantage` (or `gt_labeling.sh` with `DATA_PATH` = the eval repo). The resulting directory (with `data/`, `meta/tasks.jsonl`, `videos/`) is your advantage dataset.
+   - Place or link it at e.g. `./data/FlattenFold/advantage` and set `repo_id` in config to that path.
 
 2. **Config paths**  
    In `src/openpi/training/config.py`, for the AWBC config(s) you use:

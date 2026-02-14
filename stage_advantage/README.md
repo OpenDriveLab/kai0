@@ -141,7 +141,7 @@ TrainConfig(
 
 ### Usage
 
-From the **repository root**:
+From the **repository root**, the core training command is:
 
 ```bash
 # Single GPU (KAI0 or PI06)
@@ -162,6 +162,17 @@ uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_n
 ```
 
 Logs and checkpoints go to `experiment/<config_name>/` and `experiment/<config_name>/log/<exp_name>.log`. Redirect to a log file if desired, e.g. `2>&1 | tee experiment/ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD/log/run1.log`.
+
+For a ready-to-use script with environment setup (conda/venv activation, DDP configuration) and automatic log management, see **`annotation/train_estimator.sh`**:
+
+```bash
+RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 bash stage_advantage/annotation/train_estimator.sh
+
+# Multi-GPU
+RUNNAME=ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD RUNTIME=run1 NPROC_PER_NODE=8 bash stage_advantage/annotation/train_estimator.sh
+```
+
+The shell script handles output directory creation, log redirection (via `tee`), and multi-GPU/multi-node dispatch automatically.
 
 ### Training Outputs
 
@@ -212,7 +223,7 @@ experiment/ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD/   # or ADVANTAGE_TORCH_PI06_FLATTE
 
 ### Usage
 
-From the **repository root** (or ensure Python can import the project and paths are correct):
+From the **repository root**, the core evaluation command is:
 
 ```bash
 uv run python stage_advantage/annotation/eval.py <model_type> <model_name> <repo_id>
@@ -228,7 +239,13 @@ uv run python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/data
 uv run python stage_advantage/annotation/eval.py Flatten-Fold PI06 /path/to/dataset
 ```
 
-`<model_type>` is a key in `eval.py`’s `MODELS_CONFIG_MAP` (e.g. `Flatten-Fold`); `<model_name>` is `PI06` or `KAI0`; `<repo_id>` is the path to the LeRobot dataset. Results are written under `<repo_id>/data_<model_name>_<ckpt_steps>/`.
+`<model_type>` is a key in `eval.py`'s `MODELS_CONFIG_MAP` (e.g. `Flatten-Fold`); `<model_name>` is `PI06` or `KAI0`; `<repo_id>` is the path to the LeRobot dataset. Results are written under `<repo_id>/data_<model_name>_<ckpt_steps>/`.
+
+For a ready-to-use script with environment setup (conda/venv activation, environment variables) and status logging, see **`annotation/eval.sh`**:
+
+```bash
+bash stage_advantage/annotation/eval.sh Flatten-Fold KAI0 /path/to/dataset
+```
 
 ### Evaluation Outputs
 
@@ -286,13 +303,21 @@ At **inference** time you must use the **same prompt format** as in training. To
 
 ### Usage
 
-From the repository root, run JAX training with the AWBC config and an experiment name:
+From the repository root, the core training command is:
 
 ```bash
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_awbc --exp_name=run1
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_tee_shirt_sort_awbc --exp_name=run1
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_hang_cloth_awbc --exp_name=run1
 ```
+
+For a ready-to-use script with environment setup (venv activation, `XLA_PYTHON_CLIENT_MEM_FRACTION`, `WANDB_MODE`) and automatic log management, see **`awbc/train_awbc.sh`**:
+
+```bash
+RUNNAME=pi05_flatten_fold_awbc RUNTIME=run1 bash stage_advantage/awbc/train_awbc.sh
+```
+
+The shell script handles output directory creation and log redirection (via `tee`) automatically.
 
 ---
 
@@ -304,9 +329,12 @@ stage_advantage/
 ├── annotation/                        # Stages 0–2: labeling & estimator training
 │   ├── README.md
 │   ├── gt_label.py                    # Core labeling script (progress → advantage → task_index)
-│   ├── gt_labeling.sh                 # Batch labeling for PI06 / KAI0 variants (only .sh kept here)
+│   ├── gt_labeling.sh                 # Batch labeling for PI06 / KAI0 variants
+│   ├── train_estimator.sh             # Shell script for Stage 1 training (env + DDP + logging)
 │   ├── eval.py                        # Evaluate trained estimator on datasets
+│   ├── eval.sh                        # Shell script for Stage 2 evaluation (env + logging)
 │   └── evaluator.py                   # SimpleValueEvaluator: batched GPU inference
-└── awbc/                              # Stage 3: AWBC (commands in README)
-    └── README.md
+└── awbc/                              # Stage 3: AWBC
+    ├── README.md
+    └── train_awbc.sh                  # Shell script for Stage 3 AWBC training (env + logging)
 ```

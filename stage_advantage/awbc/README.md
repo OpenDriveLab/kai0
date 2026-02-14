@@ -36,7 +36,7 @@ Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’
 
 ## Usage
 
-From the **repository root**, run training with the config name and `--exp_name`:
+From the **repository root**, the core training command is:
 
 ```bash
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_awbc --exp_name=run1
@@ -45,6 +45,14 @@ XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_hang_cloth_awbc 
 ```
 
 Checkpoints and logs are written under `experiment/<config_name>/<exp_name>/` (e.g. `experiment/pi05_flatten_fold_awbc/run1/`).
+
+For a ready-to-use script with environment setup (venv activation, `XLA_PYTHON_CLIENT_MEM_FRACTION`, `WANDB_MODE`) and automatic log management, see **`train_awbc.sh`**:
+
+```bash
+RUNNAME=pi05_flatten_fold_awbc RUNTIME=run1 bash stage_advantage/awbc/train_awbc.sh
+```
+
+The shell script handles output directory creation and log redirection (via `tee`) automatically.
 
 ## Prompt format (training and inference)
 

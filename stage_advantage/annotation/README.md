@@ -16,7 +16,7 @@ uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_n
 
 # Step 3: Evaluate the trained estimator on new data (PI06 or KAI0)
 # From repo root:
-uv run python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/dataset
+uv run python stage_advantage/annotation/eval.py Task-A KAI0 /path/to/dataset
 
 # Step 4: Use the advantage-labeled data for AWBC (Stage 3)
 # After Stage 2, run gt_labeling.sh with DATA_PATH = eval repo (or gt_label.py --advantage-source absolute_advantage).

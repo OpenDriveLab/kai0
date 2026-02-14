@@ -235,18 +235,18 @@ Examples:
 
 ```bash
 # KAI0 (two-timestep) on a dataset
-uv run python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/dataset
+uv run python stage_advantage/annotation/eval.py Task-A KAI0 /path/to/dataset
 
 # PI06 (single-timestep)
-uv run python stage_advantage/annotation/eval.py Flatten-Fold PI06 /path/to/dataset
+uv run python stage_advantage/annotation/eval.py Task-A PI06 /path/to/dataset
 ```
 
-`<model_type>` is a key in `eval.py`'s `MODELS_CONFIG_MAP` (e.g. `Flatten-Fold`); `<model_name>` is `PI06` or `KAI0`; `<repo_id>` is the path to the LeRobot dataset. Results are written under `<repo_id>/data_<model_name>_<ckpt_steps>/`.
+`<model_type>` is a key in `eval.py`'s `MODELS_CONFIG_MAP` (e.g. `Task-A`); `<model_name>` is `PI06` or `KAI0`; `<repo_id>` is the path to the LeRobot dataset. Results are written under `<repo_id>/data_<model_name>_<ckpt_steps>/`.
 
 For a ready-to-use script with environment setup (conda/venv activation, environment variables) and status logging, see **`annotation/eval.sh`**:
 
 ```bash
-bash stage_advantage/annotation/eval.sh Flatten-Fold KAI0 /path/to/dataset
+bash stage_advantage/annotation/eval.sh Task-A KAI0 /path/to/dataset
 ```
 
 ### Evaluation Outputs
@@ -274,13 +274,13 @@ The output parquets can then be used in Stage 3 (AWBC) or fed back into Stage 0 
 
 **Goal**: Train a policy using **Advantage-Weighted Behavior Cloning (AWBC)**. The advantage labels (from Stage 0 + Stage 2) are stored as `task_index` per frame and as prompt strings in `meta/tasks.jsonl`. By setting **`prompt_from_task=True`** in the data config, each sample’s prompt is taken from that mapping, so the policy is conditioned on the advantage-derived label (e.g. high vs low advantage) and effectively does advantage-weighted behavior cloning via the language channel.
 
-**Configs** (in `src/openpi/training/config.py`): `pi05_flatten_fold_awbc`, `pi05_tee_shirt_sort_awbc`, `pi05_hang_cloth_awbc`. Each uses `LerobotAgilexDataConfig` or `LerobotARXDataConfig` with `base_config=DataConfig(prompt_from_task=True)` and `repo_id` pointing to the **advantage** dataset (e.g. `.../data/FlattenFold/advantage`).
+**Configs** (in `src/openpi/training/config.py`): `pi05_flatten_fold_awbc`, `pi05_tee_shirt_sort_awbc`, `pi05_hang_cloth_awbc`. Each uses `LerobotAgilexDataConfig` or `LerobotARXDataConfig` with `base_config=DataConfig(prompt_from_task=True)` and `repo_id` pointing to the **advantage** dataset (e.g. `.../data/Task_A/advantage`).
 
 ### What the policy sees as prompt (training)
 
 The prompt is read from the dataset’s **`meta/tasks.jsonl`**: each frame’s `task_index` is mapped to a task string, and that string is passed to the policy as the language prompt. **`gt_label.py`** (Stage 0) writes these strings when it builds the advantage-labeled dataset.
 
-- **Binary mode** (typical): `task_index=0` → `"<task>, Advantage: negative"`, `task_index=1` → `"<task>, Advantage: positive"`. The `<task>` text is set in `gt_label.py` (e.g. `"fold the cloth"` for FlattenFold).
+- **Binary mode** (typical): `task_index=0` → `"<task>, Advantage: negative"`, `task_index=1` → `"<task>, Advantage: positive"`. The `<task>` text is set in `gt_label.py` (e.g. `"fold the cloth"` for Task_A).
 - **n_slices mode**: `task_index=i` → `"<task>, Advantage: {i}"`.
 
 So during AWBC training the model is conditioned on prompts that explicitly include the advantage label (e.g. `"fold the cloth, Advantage: positive"` or `"fold the cloth, Advantage: negative"`).
@@ -299,7 +299,7 @@ At **inference** time you must use the **same prompt format** as in training. To
 
 ### Before training
 
-1. **Produce the advantage dataset:** Run Stage 2 (eval) on your dataset so it has `data_PI06_100000/` or `data_KAI0_100000/`. Then run Stage 0 (e.g. `gt_labeling.sh`) with `DATA_PATH` = that repo and source subdirs `data_PI06_100000` / `data_KAI0_100000`; the script outputs a directory with `data/` (parquets with `task_index`), `meta/tasks.jsonl`, and `videos`. Use that directory as the advantage dataset (e.g. copy or link it to `./data/FlattenFold/advantage`).
+1. **Produce the advantage dataset:** Run Stage 2 (eval) on your dataset so it has `data_PI06_100000/` or `data_KAI0_100000/`. Then run Stage 0 (e.g. `gt_labeling.sh`) with `DATA_PATH` = that repo and source subdirs `data_PI06_100000` / `data_KAI0_100000`; the script outputs a directory with `data/` (parquets with `task_index`), `meta/tasks.jsonl`, and `videos`. Use that directory as the advantage dataset (e.g. copy or link it to `./data/Task_A/advantage`).
 2. In `config.py`, set **`repo_id`** to that advantage dataset path and **`weight_loader`** to your π₀.5 base checkpoint for the AWBC config(s) you use.
 3. **Compute norm stats:**  
    `uv run python scripts/compute_norm_states_fast.py --config-name pi05_flatten_fold_awbc`  

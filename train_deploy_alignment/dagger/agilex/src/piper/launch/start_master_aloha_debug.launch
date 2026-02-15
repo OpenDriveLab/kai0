@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Standalone master arm control (debug) -->
+    <node name="master_arm_controller" 
+          pkg="piper" 
+          type="piper_start_master_node_debug.py" 
+          output="screen" 
+          respawn="false">
+        <param name="can_port" value="can_left_master"/>
+        <param name="control_rate" value="10"/>  <!-- Control rate Hz -->
+        <param name="auto_test" value="false"/>  <!-- Auto test on start -->
+        <remap from="/master/joint_states" to="/master/joint_states"/>
+        <remap from="/master/joint_cmd" to="/master/joint_cmd"/>
+        <remap from="/master/enable" to="/master/enable"/>
+        <remap from="/master/teach_mode" to="/master/teach_mode"/>
+        <remap from="/master/arm_status" to="/master/arm_status"/>
+    </node>
+</launch>

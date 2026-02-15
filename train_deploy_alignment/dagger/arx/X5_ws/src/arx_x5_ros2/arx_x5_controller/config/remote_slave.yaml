@@ -1,0 +1,15 @@
+/arm_slave_l:
+  ros__parameters:
+    arm_can_id: can1
+    arm_control_type: remote_slave
+    arm_pub_topic_name: arm_slave_l_status
+    arm_sub_topic_name: arm_master_l_status
+    arm_end_type: 0
+    
+/arm_slave_r:
+  ros__parameters:
+    arm_can_id: can3
+    arm_control_type: remote_slave
+    arm_pub_topic_name: arm_slave_r_status
+    arm_sub_topic_name: arm_master_r_status
+    arm_end_type: 0

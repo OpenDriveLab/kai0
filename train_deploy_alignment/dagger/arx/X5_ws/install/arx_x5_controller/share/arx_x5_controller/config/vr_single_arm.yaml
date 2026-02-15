@@ -1,0 +1,7 @@
+/vr_arm:
+  ros__parameters:
+    arm_can_id: can1
+    arm_control_type: vr_slave
+    arm_pub_topic_name: arm_l_status
+    arm_sub_topic_name: ARX_VR_L
+    arm_end_type: 0

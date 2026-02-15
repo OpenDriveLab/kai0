@@ -1,0 +1,23 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from arx5_arm_msg/msg/RobotStatus.msg
+// generated code does not contain a copyright notice
+
+#include "std_msgs/msg/Header.idl"
+
+module arx5_arm_msg {
+  module msg {
+    typedef double double__6[6];
+    typedef double double__7[7];
+    struct RobotStatus {
+      std_msgs::msg::Header header;
+
+      double__6 end_pos;
+
+      double__7 joint_pos;
+
+      double__7 joint_vel;
+
+      double__7 joint_cur;
+    };
+  };
+};

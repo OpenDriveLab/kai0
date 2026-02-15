@@ -1,0 +1,13 @@
+.catkin_workspace
+src/CMakeLists.txt
+devel
+build
+.vscode
+src/piper/backup
+.catkin_workspace
+*.log
+*.7z
+*.zip
+*.tar
+MUJOCO_LOG.TXT
+analytical_solution

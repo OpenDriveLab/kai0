@@ -21,7 +21,7 @@
 
 - **[Model Arithmetic](#model-arithmetic)**: A weight-space merging strategy that combines models trained on different data subsets, efficiently capturing diverse knowledge without architectural complexity. **[Released]**
 - **[Stage Advantage](#stage-advantage)**: A stage-aware advantage estimator that provides stable, dense progress signals for policy training. **[Released]**
-- **[Train-Deploy Alignment](#train-deploy-alignment-coming-soon)**: Bridges the distribution gap via spatio-temporal augmentation, heuristic DAgger corrections, and temporal chunk-wise smoothing. **[Coming Soon]**
+- **[Train-Deploy Alignment](#train-deploy-alignment)**: Bridges the distribution gap via spatio-temporal augmentation, heuristic DAgger corrections, and temporal chunk-wise smoothing. **[Released]**
 
 χ₀ enables two sets of dual-arm robots to collaboratively orchestrate long-horizon garment manipulation — flattening, folding, and hanging — surpassing the state-of-the-art $\pi_{0.5}$ baseline by approximately 250% in success rate, with `only 20 hours of data and 8 A100 GPUs`.
 
@@ -47,13 +47,15 @@ https://github.com/user-attachments/assets/3f5f0c48-ff3f-4b9b-985b-59ad0b2ea97c
   - [Workflow](#workflow)
   - [Quick Start](#quick-start)
 - [Stage Advantage](#stage-advantage)
-- [Train-Deploy Alignment (Coming Soon)](#train-deploy-alignment-coming-soon)
+- [Train-Deploy Alignment](#train-deploy-alignment)
 - [Citation](#licenseandcitation)
 - [Troubleshooting](#troubleshooting)
 - [Links and Community](#links-and-community)
 
 ## Update
 
+- [Feb 15 2026] Stage Advantage **advantage labels** (`Task_A/advantage/`) released on [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0).
+- [Feb 15 2026] Release of the **Train-Deploy Alignment** module: data augmentation (time scaling, space mirroring), DAgger data collection, inference with temporal smoothing/ensembling and RTC, and HDF5-to-LeRobot conversion.
 - [Feb 14 2026] Release of the **Stage Advantage** module: advantage estimator training, evaluation, GT labeling, and AWBC training pipeline.
 - [Feb 10 2026] Initial release of the **Model Arithmetic** module with support for both JAX and PyTorch checkpoints (not tested thoroughly).
 - [Feb 10 2026] χ₀ paper released.
@@ -80,7 +82,7 @@ Non-edge components (e.g., Policy Training, Model Arithmetic) have been tested o
 
 ### Hardware
 
-For real-robot deployment (dual-arm setup, cameras, and table layout), see **[Hardware Setup & 3D Print Files](setup/README.md)**. That document covers supported platforms (Agilex Piper for FlattenFold / TeeShirtSort, ARX X5 for HangCloth), Intel RealSense D435i camera placement, 3D-printed grippers and mounts with usage notes, and inference host GPU (RTX 4090 in Ubuntu 20.04).
+For real-robot deployment (dual-arm setup, cameras, and table layout), see **[Hardware Setup & 3D Print Files](setup/README.md)**. That document covers supported platforms (Agilex Piper for Task_A / Task_B, ARX X5 for Task_C), Intel RealSense D435i camera placement, 3D-printed grippers and mounts with usage notes, and inference host GPU (RTX 4090 in Ubuntu 20.04).
 
 ## Installation
 
@@ -116,11 +118,11 @@ Download the Kai0 dataset so it is available under `./data` for training and eva
 python scripts/download_dataset.py
 ```
 
-This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (FlattenFold, HangCloth, TeeShirtSort). To download only specific tasks or use a custom path, see the [dataset docs](docs/dataset.md#step-1-download-the-dataset).
+This fetches the full dataset from [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) into `./data` (Task_A, Task_B, Task_C). To download only specific tasks or use a custom path, see the [dataset docs](docs/dataset.md#step-1-download-the-dataset).
 
 ### 2. Download checkpoints (optional, for testing)
 
-We provide **one best model per task** (FlattenFold, HangCloth, TeeShirtSort) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main).
+We provide **one best model per task** (Task_A, Task_B, Task_C) in the [Kai0 repo on Hugging Face](https://huggingface.co/OpenDriveLab-org/Kai0/tree/main).
 
 From the repository root, you can download all best-model checkpoints to `./checkpoints` with:
 
@@ -131,7 +133,7 @@ python scripts/download_checkpoints.py
 To download only specific tasks or use a custom path, run:
 
 ```bash
-python scripts/download_checkpoints.py --tasks FlattenFold HangCloth --local-dir ./my_checkpoints
+python scripts/download_checkpoints.py --tasks Task_A Task_C --local-dir ./my_checkpoints
 ```
 
 After download, set `weight_loader` in the training config to the path of the corresponding checkpoint directory (see step 3 below). You can also use openpi’s pretrained π₀.5 checkpoint instead.
@@ -144,7 +146,7 @@ After the dataset is in `./data`, you can run **normal π₀.₅ full fine-tunin
 
 Edit [`src/openpi/training/config.py`](src/openpi/training/config.py) (around lines 1173–1226) for the task(s) you need:
 
-- **`repo_id`**: set to the **absolute path** to the dataset subset, e.g. `<path_to_repo_root>/data/FlattenFold/base`, `<path_to_repo_root>/data/TeeShirtSort/base`, or `<path_to_repo_root>/data/HangCloth/base`.
+- **`repo_id`**: set to the **absolute path** to the dataset subset, e.g. `<path_to_repo_root>/data/Task_A/base`, `<path_to_repo_root>/data/Task_B/base`, or `<path_to_repo_root>/data/Task_C/base`.
 - **`weight_loader`**: set to the path of your **π₀.₅ base checkpoint** — either the best model you downloaded in step 2 above, or openpi’s pretrained π₀.₅ checkpoint.
 
 Config names to use: e.g. `pi05_flatten_fold_normal`
@@ -210,8 +212,8 @@ Checkpoints are written to the config’s checkpoint directory. You can then use
 - [x] kai0 oracle: training and inference code with non-advantage data of three tasks
 - [x] Model Arithmetic: code of different baselines for weight-space interpolation
 - [x] Stage Advantage: code, data (advantage labels), and checkpoints
-- [ ] HuggingFace & ModelScope: upload Stage Advantage data and checkpoints — **Feb 14**
-- [ ] Train-Deploy Alignment — **Feb 14**
+- [x] Train-Deploy Alignment: data augmentation, DAgger, inference (temporal smoothing, ensembling, RTC)
+- [x] HuggingFace & ModelScope: Stage Advantage data (`Task_A/advantage/`) and checkpoints uploaded
 
 ## Model Arithmetic
 
@@ -300,7 +302,7 @@ For a ready-to-use script with environment setup (conda/venv activation, DDP con
 **Stage 2 — Advantage Estimation on New Data**: Use the trained estimator to label datasets with predicted advantage values.
 
 ```bash
-uv run python stage_advantage/annotation/eval.py Flatten-Fold KAI0 /path/to/dataset
+uv run python stage_advantage/annotation/eval.py Task-A KAI0 /path/to/dataset
 ```
 
 For a ready-to-use script with environment setup and status logging, see `stage_advantage/annotation/eval.sh`.
@@ -315,14 +317,56 @@ For a ready-to-use script with environment setup and automatic log management, s
 
 For the full pipeline details, configuration instructions, and all parameters, see [`stage_advantage/README.md`](stage_advantage/README.md).
 
-## Train-Deploy Alignment (Coming Soon)
+## Train-Deploy Alignment
 
-Train-Deploy Alignment bridges the distribution gap between training and real-world deployment through:
-- **Spatio-temporal augmentation**: Data augmentation including space mirroring and time scaling for dual-arm setups.
-- **Heuristic DAgger corrections**: Interactive on-robot data collection for iterative policy improvement.
-- **Temporal chunk-wise smoothing**: Smoothed action execution to reduce jitter during deployment.
+Train-Deploy Alignment bridges the distribution gap between training and real-world deployment through three sub-modules:
 
-**This module is currently under refinement and will be released soon.**
+- **Data Augmentation** (`train_deploy_alignment/data_augment/`): Time scaling (frame extraction at configurable rates), space mirroring (left/right arm swap + video flip), dataset merging, and HDF5-to-LeRobot format conversion.
+- **DAgger** (`train_deploy_alignment/dagger/`): Policy-in-the-loop data collection for both Agilex Piper and ARX X5 platforms. Operators run inference, switch to DAgger mode for human corrections, and save episodes (HDF5 + optional videos + intervention labels).
+- **Inference** (`train_deploy_alignment/inference/`): Deployment code for Agilex and ARX robots with multiple execution modes — synchronous, temporal smoothing, temporal ensembling, and **RTC (real-time chunking)**. Uses a two-machine setup (GPU policy server + robot IPC client).
+
+### Quick Start
+
+**Data Augmentation — Time scaling:**
+
+```bash
+python train_deploy_alignment/data_augment/time_scaling.py \
+  --src_path /path/to/source --tgt_path /path/to/extracted --repo_id extracted_dataset \
+  --extraction_factor 2
+```
+
+**Data Augmentation — Space mirroring (mirror + merge):**
+
+```bash
+python train_deploy_alignment/data_augment/space_mirroring.py full \
+  --src-path /path/to/original --mirror-path /path/to/mirrored --merge-path /path/to/merged \
+  --repo-id my_dataset
+```
+
+**DAgger — Agilex:** Start the policy server on the GPU host, then on the IPC:
+
+```bash
+conda activate kai0_inference
+python train_deploy_alignment/dagger/agilex/agilex_openpi_dagger_collect.py \
+  --host <gpu_host_ip> --port 8000 --ctrl_type joint --use_temporal_smoothing --chunk_size 50 \
+  --dataset_name <your_dataset_name>
+```
+
+**Inference — Agilex (temporal smoothing):** Start the policy server on the GPU host, then on the IPC:
+
+```bash
+conda activate kai0_inference
+python inference/agilex_inference_openpi_temporal_smoothing.py \
+  --host <gpu_host_ip> --port 8000 --ctrl_type joint --use_temporal_smoothing --chunk_size 50
+```
+
+**Inference — ARX (RTC mode):** Start the policy server with an RTC config, then on the IPC:
+
+```bash
+python inference/arx_openpi_inference_rtc.py --host <gpu_host_ip> --port 8000 --rtc_mode --chunk_size 50
+```
+
+For full setup instructions (IPC environment, CAN, ROS/ROS2, platform-specific details), see [`train_deploy_alignment/README.md`](train_deploy_alignment/README.md).
 
 ## License and Citation
 

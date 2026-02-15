@@ -1,0 +1,15 @@
+/arm_l:
+  ros__parameters:
+    arm_can_id: can1
+    arm_control_type: joint_control_v1
+    arm_pub_topic_name: joint_information
+    arm_sub_topic_name: joint_control
+    arm_end_type: 0
+
+/arm_r:
+  ros__parameters:
+    arm_can_id: can3
+    arm_control_type: joint_control_v1
+    arm_pub_topic_name: joint_information2
+    arm_sub_topic_name: joint_control2
+    arm_end_type: 0

@@ -8,23 +8,27 @@ All three are defined in `src/openpi/training/config.py`:
 
 | Config name | Task | Data config |
 |-------------|------|-------------|
-| `pi05_flatten_fold_awbc` | FlattenFold | `LerobotAgilexDataConfig`, `repo_id=.../data/FlattenFold/advantage` |
-| `pi05_tee_shirt_sort_awbc` | TeeShirtSort | `LerobotAgilexDataConfig`, `repo_id=.../data/TeeShirtSort/advantage` |
-| `pi05_hang_cloth_awbc` | HangCloth | `LerobotARXDataConfig`, `repo_id=.../data/HangCloth/advantage` |
+| `pi05_flatten_fold_awbc` | Task_A | `LerobotAgilexDataConfig`, `repo_id=.../data/Task_A/advantage` |
+| `pi05_tee_shirt_sort_awbc` | Task_B | `LerobotAgilexDataConfig`, `repo_id=.../data/Task_B/advantage` |
+| `pi05_hang_cloth_awbc` | Task_C | `LerobotARXDataConfig`, `repo_id=.../data/Task_C/advantage` |
 
 Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’s `task_index` column and `meta/tasks.jsonl` supply the prompt (advantage-derived label) per frame.
 
 ## Prerequisites
 
 1. **Advantage dataset**  
-   The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`). To build it:
+   The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`).
+
+   **Pre-annotated data:** The released dataset includes **`Task_A/advantage/`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (no need to run Stage 0–2 first). It is available in both the [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0) dataset repos. After downloading, set the AWBC config `repo_id` to the local path (e.g. `<repo_root>/data/Task_A/advantage`) and run the training commands below.
+
+   To build your own advantage dataset instead:
    - Run **Stage 2** (eval) on your dataset → get `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns.
    - Run **Stage 0** on that output: `gt_label.py --advantage-source absolute_advantage` (or `gt_labeling.sh` with `DATA_PATH` = the eval repo). The resulting directory (with `data/`, `meta/tasks.jsonl`, `videos/`) is your advantage dataset.
-   - Place or link it at e.g. `./data/FlattenFold/advantage` and set `repo_id` in config to that path.
+   - Place or link it at e.g. `./data/Task_A/advantage` and set `repo_id` in config to that path.
 
 2. **Config paths**  
    In `src/openpi/training/config.py`, for the AWBC config(s) you use:
-   - Set **`repo_id`** to the **absolute path** of the advantage dataset (e.g. `<path_to_repo_root>/data/FlattenFold/advantage`).
+   - Set **`repo_id`** to the **absolute path** of the advantage dataset (e.g. `<path_to_repo_root>/data/Task_A/advantage`).
    - Set **`weight_loader`** to your **π₀.5 base checkpoint** path.
 
 3. **Norm stats**  

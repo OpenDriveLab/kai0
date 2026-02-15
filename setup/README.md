@@ -6,15 +6,15 @@ Quick reference for deploying and debugging hardware for the supported task plat
 
 ## Table of Contents
 
-- [1. FlattenFold / TeeShirtSort (Agilex Piper)](#1-flattenfold--teeshirtsort-agilex-piper)
-- [2. HangCloth (ARX X5)](#2-hangcloth-arx-x5)
+- [1. Task_A / Task_B (Agilex Piper)](#1-task_a--task_b-agilex-piper)
+- [2. Task_C (ARX X5)](#2-task_c-arx-x5)
 - [3. Inference Host](#3-inference-host)
 
 ---
 
-## 1. FlattenFold / TeeShirtSort (Agilex Piper)
+## 1. Task_A / Task_B (Agilex Piper)
 
-**Directories:** `FlattenFold/`, `TeeShirtSort/`
+**Directories:** `Task_A/`, `Task_B/`
 
 ### 1.1 Components
 
@@ -24,7 +24,7 @@ Quick reference for deploying and debugging hardware for the supported task plat
 | Cameras | Intel RealSense D435 (triple-camera setup) |
 | Printed parts | Left/right wrist camera mounts, center camera mount, center camera base |
 
-### 1.2 FlattenFold Layout
+### 1.2 Task_A Layout
 
 | Parameter | Value |
 |-----------|-------|
@@ -37,7 +37,7 @@ Quick reference for deploying and debugging hardware for the supported task plat
 | Right primary arm → table front edge | 12 cm |
 | Left–right primary arm center distance | 39 cm |
 
-### 1.3 TeeShirtSort Layout (demoA-style)
+### 1.3 Task_B Layout (demoA-style)
 
 | Parameter | Value |
 |-----------|-------|
@@ -50,7 +50,7 @@ Quick reference for deploying and debugging hardware for the supported task plat
 | Right primary arm → table front edge | 11 cm |
 | Left–right primary arm center distance | 40 cm |
 
-### 1.4 3D Models — Usage (FlattenFold / TeeShirtSort)
+### 1.4 3D Models — Usage (Task_A / Task_B)
 
 #### Gripper (end-effector)
 
@@ -77,9 +77,9 @@ Quick reference for deploying and debugging hardware for the supported task plat
 
 ---
 
-## 2. HangCloth (ARX X5)
+## 2. Task_C (ARX X5)
 
-**Directory:** `HangCloth/`
+**Directory:** `Task_C/`
 
 ### 2.1 Components
 
@@ -102,7 +102,7 @@ Quick reference for deploying and debugging hardware for the supported task plat
 | Right primary arm → table front edge | 11 cm |
 | Left–right primary arm center distance | 53 cm |
 
-### 2.3 3D Models — Usage (HangCloth)
+### 2.3 3D Models — Usage (Task_C)
 
 #### Grippers (secondary arms)
 

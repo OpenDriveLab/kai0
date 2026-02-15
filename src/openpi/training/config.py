@@ -115,7 +115,7 @@ class ModelTransformFactory(GroupFactory):
 
     def __call__(self, model_config: _model.BaseModelConfig) -> _transforms.Group:
         match model_config.model_type:
-            case _model.ModelType.PI0:
+            case _model.ModelType.PI0 | _model.ModelType.PI0_RTC:
                 return _transforms.Group(
                     inputs=[
                         _transforms.InjectDefaultPrompt(self.default_prompt),
@@ -126,7 +126,7 @@ class ModelTransformFactory(GroupFactory):
                         _transforms.PadStatesAndActions(model_config.action_dim),
                     ],
                 )
-            case _model.ModelType.PI05:
+            case _model.ModelType.PI05 | _model.ModelType.PI05_RTC:
                 assert isinstance(model_config, pi0_config.Pi0Config)
                 return _transforms.Group(
                     inputs=[
@@ -187,7 +187,7 @@ class DataConfigFactory(abc.ABC):
             repo_id=repo_id,
             asset_id=asset_id,
             norm_stats=self._load_norm_stats(epath.Path(self.assets.assets_dir or assets_dirs), asset_id),
-            use_quantile_norm=model_config.model_type != ModelType.PI0,
+            use_quantile_norm=model_config.model_type not in (ModelType.PI0, ModelType.PI0_RTC),
         )
 
     def _load_norm_stats(self, assets_dir: epath.Path, asset_id: str | None) -> dict[str, _transforms.NormStats] | None:
@@ -1370,6 +1370,23 @@ _CONFIGS = [
         keep_period=5000,
         num_workers=8, 
         batch_size=256, 
+    ),
+
+    #**************************FlattenFold RTC Inference*******************************
+    # Use this config when serving the policy for agilex_inference_openpi_rtc.py (JAX checkpoints only).
+    TrainConfig(
+        name="pi05_rtc_flatten_fold_inference",
+        model=pi0_config.Pi0RTCConfig(pi05=True),
+        data=LerobotAgilexDataConfig(
+            repo_id="<path_to_repo_root>/data/FlattenFold/base",
+            default_prompt="Flatten and fold the cloth.",
+            use_delta_joint_actions=False,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("<path_to/pi05_base/checkpoint>"),
+        num_train_steps=100_000,
+        keep_period=5000,
+        num_workers=8,
+        batch_size=256,
     ),
     # RoboArena & PolaRiS configs.
     *roboarena_config.get_roboarena_configs(),

@@ -322,7 +322,7 @@ class Pi0RTC(_model.BaseModel):
             x_t_for_denoise = x_t
             if mask_prefix_delay and provided_dim > 0:
                 mask_time = (jnp.arange(self.action_horizon) < d).astype(bool)[None, :, None]
-                # 仅覆盖提供的维度，其余保持 x_t 原值
+                # Overwrite only the provided dims in the delay prefix; leave the rest as x_t.
                 overwrite = jnp.where(mask_time, prev_chunk[..., :provided_dim], x_t_for_denoise[..., :provided_dim])
                 x_t_for_denoise = x_t_for_denoise.at[..., :provided_dim].set(overwrite)
 

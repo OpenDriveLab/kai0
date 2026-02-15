@@ -1,0 +1,16 @@
+<launch>
+  <!-- mode=0: read master/slave and forward to ROS -->
+  <arg name="auto_enable" default="true" />
+
+  <!-- Left master arm -->
+  <node name="$(anon piper_master_left)" pkg="piper" type="piper_start_master_node.py" output="screen">
+    <param name="can_port" value="can_left" />
+    <remap from="/master/joint_states" to="/master/joint_left" />
+  </node>
+
+  <!-- Right master arm -->
+  <node name="$(anon piper_master_right)" pkg="piper" type="piper_start_master_node.py" output="screen">
+    <param name="can_port" value="can_right" />
+    <remap from="/master/joint_states" to="/master/joint_right" />
+  </node>
+</launch>

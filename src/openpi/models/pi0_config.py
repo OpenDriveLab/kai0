@@ -13,6 +13,7 @@ import openpi.shared.nnx_utils as nnx_utils
 
 if TYPE_CHECKING:
     from openpi.models.pi0 import Pi0
+    from openpi.models.pi0_rtc import Pi0RTC
 
 
 @dataclasses.dataclass(frozen=True)
@@ -106,6 +107,33 @@ class Pi0Config(_model.BaseModelConfig):
         if not filters:
             return nnx.Nothing
         return nnx.All(*filters)
+
+
+@dataclasses.dataclass(frozen=True)
+class Pi0RTCConfig(Pi0Config):
+    """Config for Pi0RTC (real-time control) model. Uses same architecture as Pi0/Pi05 but sample_actions supports
+    prev_action_chunk, inference_delay, execute_horizon for RTC guidance. Use this config when serving
+    for RTC inference (e.g. agilex_inference_openpi_rtc.py). Set pi05=True for Pi05-based RTC (model_type PI05_RTC)."""
+
+    @property
+    @override
+    def model_type(self) -> _model.ModelType:
+        return _model.ModelType.PI05_RTC if self.pi05 else _model.ModelType.PI0_RTC
+
+    @override
+    def create(self, rng: at.KeyArrayLike) -> "Pi0RTC":
+        from openpi.models.pi0_rtc import Pi0RTC
+
+        return Pi0RTC(self, rngs=nnx.Rngs(rng))
+
+    @override
+    def load_pytorch(self, train_config, weight_path: str):
+        """RTC model is JAX-only; use a JAX checkpoint with serve_policy and Pi0RTCConfig."""
+        raise NotImplementedError(
+            "Pi0RTC is only supported with JAX checkpoints. Use a checkpoint saved from OpenPi JAX training "
+            "(params directory, not model.safetensors) and serve with --policy.config=pi05_rtc_flatten_fold_inference (or your RTC config name)."
+        )
+
 
 @dataclasses.dataclass(frozen=True)
 class AdvantageEstimatorConfig(Pi0Config):

@@ -1,6 +1,6 @@
-# Stage 3: AWBC (Advantage-Weighted Behavior Cloning)
+# Step 4: AWBC (Advantage-Weighted Behavior Cloning)
 
-Train a policy on **advantage-labeled** data so that the prompt conditions the policy on the advantage bin (e.g. high vs low advantage). This is implemented by setting **`prompt_from_task=True`** in the data config: each sample’s `task_index` is mapped to a prompt string via `meta/tasks.jsonl`, and that prompt is fed to the policy as language conditioning. Full pipeline (Stage 0 → 1 → 2 → 0 → 3) is in the [parent README](../README.md).
+Train a policy on **advantage-labeled** data so that the prompt conditions the policy on the advantage bin (e.g. high vs low advantage). This is implemented by setting **`prompt_from_task=True`** in the data config: each sample's `task_index` is mapped to a prompt string via `meta/tasks.jsonl`, and that prompt is fed to the policy as language conditioning. Full pipeline (Step 0 → 1 → 2 → 3 → 4) is in the [parent README](../README.md).
 
 ## Configs
 
@@ -12,18 +12,18 @@ All three are defined in `src/openpi/training/config.py`:
 | `pi05_tee_shirt_sort_awbc` | Task_B | `LerobotAgilexDataConfig`, `repo_id=.../data/Task_B/advantage` |
 | `pi05_hang_cloth_awbc` | Task_C | `LerobotARXDataConfig`, `repo_id=.../data/Task_C/advantage` |
 
-Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’s `task_index` column and `meta/tasks.jsonl` supply the prompt (advantage-derived label) per frame.
+Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset's `task_index` column and `meta/tasks.jsonl` supply the prompt (advantage-derived label) per frame.
 
 ## Prerequisites
 
 1. **Advantage dataset**  
    The data must have `task_index` in each parquet and `meta/tasks.jsonl` (prompt strings per `task_index`).
 
-   **Pre-annotated data:** The released dataset includes **`Task_A/advantage/`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (no need to run Stage 0–2 first). It is available in both the [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0) dataset repos. After downloading, set the AWBC config `repo_id` to the local path (e.g. `<repo_root>/data/Task_A/advantage`) and run the training commands below.
+   **Pre-annotated data:** The released dataset includes **`Task_A/advantage/`**, a fully annotated advantage dataset that can be used **directly for AWBC training** (no need to run Step 0–3 first). It is available in both the [Hugging Face](https://huggingface.co/datasets/OpenDriveLab-org/Kai0) and [ModelScope](https://www.modelscope.cn/datasets/OpenDriveLab/Kai0) dataset repos. After downloading, set the AWBC config `repo_id` to the local path (e.g. `<repo_root>/data/Task_A/advantage`) and run the training commands below.
 
    To build your own advantage dataset instead:
-   - Run **Stage 2** (eval) on your dataset → get `data_PI06_100000/` or `data_KAI0_100000/` with advantage columns.
-   - Run **Stage 0** on that output: `gt_label.py --advantage-source absolute_advantage` (or `gt_labeling.sh` with `DATA_PATH` = the eval repo). The resulting directory (with `data/`, `meta/tasks.jsonl`, `videos/`) is your advantage dataset.
+   - Run **Step 2** (eval.py) on your dataset → get `data_PI06_100000/` or `data_KAI0_100000/` with predicted advantage columns.
+   - Run **Step 3** (`discretize_advantage.py --advantage-source absolute_advantage`, or batch via `discretize_advantage.sh`). The resulting directory (with `data/`, `meta/tasks.jsonl`, `videos/`) is your advantage dataset.
    - Place or link it at e.g. `./data/Task_A/advantage` and set `repo_id` in config to that path.
 
 2. **Config paths**  
@@ -40,7 +40,21 @@ Each uses `base_config=DataConfig(prompt_from_task=True)` so that the dataset’
 
 ## Usage
 
-From the **repository root**, the core training command is:
+From the **repository root**, activate the venv and set env vars, then run training:
+
+```bash
+source .venv/bin/activate
+export WANDB_MODE=${WANDB_MODE:-offline}
+export XLA_PYTHON_CLIENT_MEM_FRACTION=${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.9}
+
+RUNNAME=pi05_flatten_fold_awbc
+RUNTIME=run1
+mkdir -p "./experiment/${RUNNAME}/log"
+uv run scripts/train.py ${RUNNAME} --exp_name=${RUNTIME} \
+    2>&1 | tee "./experiment/${RUNNAME}/log/${RUNTIME}.log"
+```
+
+Or the core command only:
 
 ```bash
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_awbc --exp_name=run1
@@ -48,23 +62,13 @@ XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_tee_shirt_sort_a
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_hang_cloth_awbc --exp_name=run1
 ```
 
-Checkpoints and logs are written under `experiment/<config_name>/<exp_name>/` (e.g. `experiment/pi05_flatten_fold_awbc/run1/`).
-
-For a ready-to-use script with environment setup (venv activation, `XLA_PYTHON_CLIENT_MEM_FRACTION`, `WANDB_MODE`) and automatic log management, see **`train_awbc.sh`**:
-
-```bash
-RUNNAME=pi05_flatten_fold_awbc RUNTIME=run1 bash stage_advantage/awbc/train_awbc.sh
-```
-
-The shell script handles output directory creation and log redirection (via `tee`) automatically.
+Checkpoints and logs are written under `experiment/<config_name>/<exp_name>/` and `experiment/<config_name>/log/<exp_name>.log`.
 
 ## Prompt format (training and inference)
 
-During **training**, the prompt is taken from **`meta/tasks.jsonl`**: each sample’s `task_index` is mapped to a string (written by `gt_label.py` when creating the advantage dataset).
+During **training**, the prompt is taken from **`meta/tasks.jsonl`**: each sample's `task_index` is mapped to a string (written by `discretize_advantage.py` in Step 3 when creating the advantage dataset).
 
-- **Binary mode**: `task_index=0` → `"<task>, Advantage: negative"`, `task_index=1` → `"<task>, Advantage: positive"` (e.g. `"fold the cloth, Advantage: positive"`). The `<task>` text is defined in `annotation/gt_label.py`.
+- **Binary mode**: `task_index=0` → `"<task>, Advantage: negative"`, `task_index=1` → `"<task>, Advantage: positive"` (e.g. `"fold the cloth, Advantage: positive"`). The `<task>` text is defined in `annotation/discretize_advantage.py`.
 - **n_slices mode**: `task_index=i` → `"<task>, Advantage: {i}"`.
 
 At **inference**, use the **same format** so the model sees the conditioning it was trained on. To get high-advantage behavior, pass the **positive**-advantage prompt, e.g. `"<task>, Advantage: positive"` (with the same `<task>` wording as in your `tasks.jsonl`). Using a different prompt format or omitting the advantage part can hurt performance.
-
-

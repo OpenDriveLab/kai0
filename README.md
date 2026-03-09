@@ -272,48 +272,44 @@ For gradient-based optimization, dataset splitting, and all other methods, see t
 
 Stage Advantage decomposes long-horizon tasks into semantic stages and provides stage-aware advantage signals for policy training. It addresses the numerical instability of prior non-stage approaches by computing advantage as progress differentials within each stage, yielding smoother and more stable supervision.
 
-The full pipeline has four stages:
+The full pipeline has five steps:
 
 ```
-Stage 0: GT Labeling  →  Stage 1: Train Advantage Estimator  →  Stage 2: Advantage Estimation  →  Stage 3: AWBC Training
+Step 0: Annotate stage_progress_gt (manual)  →  Step 1: Train Advantage Estimator  →  Step 2: Predict Advantage  →  Step 3: Discretize Advantage  →  Step 4: AWBC Training
 ```
 
 ### Quick Start
 
-**Stage 0 — GT Data Labeling**: Compute advantage values and discretize into `task_index` labels.
+**Step 0 — Annotate `stage_progress_gt`** (manual, no code provided): For each episode, annotate start/end timestamps and subtask split points, then compute per-frame `stage_progress_gt` (linear progress 0→1 within each subtask) and write it into the parquet files.
 
-```bash
-cd stage_advantage/annotation
-python gt_label.py <dataset_path> \
-    --threshold 30 --chunk-size 50 --discretion-type binary \
-    --advantage-source absolute_advantage
-```
-
-For batch labeling across multiple dataset variants, see `stage_advantage/annotation/gt_labeling.sh`.
-
-**Stage 1 — Train Advantage Estimator**: Fine-tune a pi0-based model to predict advantage from observations.
+**Step 1 — Train Advantage Estimator**: Fine-tune a pi0-based model to predict advantage from observations.
 
 ```bash
 uv run python scripts/train_pytorch.py ADVANTAGE_TORCH_KAI0_FLATTEN_FOLD --exp_name=run1 --save_interval 10000
 ```
 
-For a ready-to-use script with environment setup (conda/venv activation, DDP configuration) and automatic log management, see `stage_advantage/annotation/train_estimator.sh`.
-
-**Stage 2 — Advantage Estimation on New Data**: Use the trained estimator to label datasets with predicted advantage values.
+**Step 2 — Predict Advantage**: Use the trained estimator to label datasets with `absolute_advantage` and `relative_advantage`.
 
 ```bash
 uv run python stage_advantage/annotation/eval.py Task-A KAI0 /path/to/dataset
 ```
 
-For a ready-to-use script with environment setup and status logging, see `stage_advantage/annotation/eval.sh`.
+**Step 3 — Discretize Advantage**: Bin predicted advantages into positive/negative `task_index` labels.
 
-**Stage 3 — AWBC Training**: Train a policy with Advantage-Weighted Behavior Cloning.
+```bash
+cd stage_advantage/annotation
+python discretize_advantage.py <dataset_path> \
+    --threshold 30 --chunk-size 50 --discretion-type binary \
+    --advantage-source absolute_advantage
+```
+
+For batch labeling across PI06/KAI0 variants, see `stage_advantage/annotation/discretize_advantage.sh`.
+
+**Step 4 — AWBC Training**: Train a policy with Advantage-Weighted Behavior Cloning.
 
 ```bash
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_flatten_fold_awbc --exp_name=run1
 ```
-
-For a ready-to-use script with environment setup and automatic log management, see `stage_advantage/awbc/train_awbc.sh`.
 
 For the full pipeline details, configuration instructions, and all parameters, see [`stage_advantage/README.md`](stage_advantage/README.md).
 

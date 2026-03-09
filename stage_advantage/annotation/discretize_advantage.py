@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-# python label.py <dataset_path> --threshold 30 --chunk-size 50 --discretion-type binary --advantage-source absolute_advantage --stage-nums 2 --dry-run
-Script to modify task_index in parquet files based on progress rewards.
+# python discretize_advantage.py <dataset_path> --threshold 30 --chunk-size 50 --discretion-type binary --advantage-source absolute_advantage --stage-nums 2 --dry-run
+Script to modify task_index in parquet files based on predicted advantage values.
 
 This script:
 1. Reads all parquet files from path/data/chunk-*/*.parquet
-2. Calculates reward as: progress[i+50] - progress[i] for each frame
-3. Computes reward distribution statistics across all parquets
-4. Labels frames with task_index based on reward percentile threshold
+2. Reads per-frame advantage from the specified source column (absolute_advantage or relative_advantage)
+3. Computes advantage distribution statistics across all parquets
+4. Labels frames with task_index based on advantage percentile threshold
    Binary mode:
-   - task_index=0 for rewards in bottom (1-threshold)% 
-   - task_index=1 for rewards in top threshold%
+   - task_index=0 for advantages in bottom (1-threshold)%
+   - task_index=1 for advantages in top threshold%
    n_slices mode:
-   - task_index=0 to (n-1) based on reward percentiles (higher reward -> higher task_index)
+   - task_index=0 to (n-1) based on advantage percentiles (higher advantage -> higher task_index)
    - Each slice contains ~(100/n)% of frames
 
 Stage-based mode (--stage-nums > 1):
    - Each frame is assigned to a stage based on its stage_progress_gt value
    - Frames with stage_progress_gt in [i/stage_nums, (i+1)/stage_nums) belong to stage i
-   - Each stage has its own reward statistics and percentile boundaries
+   - Each stage has its own advantage statistics and percentile boundaries
    - task_index is assigned based on stage-specific percentiles
 """
 
@@ -35,38 +35,26 @@ import pyarrow.parquet as pq
 from tqdm import tqdm
 
 
-def calculate_rewards(data: pd.DataFrame, chunk_size: int = 50, advantage_source: str = "progress") -> np.ndarray:
+def calculate_rewards(data: pd.DataFrame, chunk_size: int = 50, advantage_source: str = "absolute_advantage") -> np.ndarray:
     """
-    Calculate rewards based on progress differences.
+    Read per-frame advantage values from the specified source column.
     
     Args:
-        data: DataFrame containing 'progress' column
-        chunk_size: Number of frames to look ahead for progress calculation
+        data: DataFrame containing the advantage column
+        chunk_size: Not used (kept for API compatibility)
+        advantage_source: Column name — "absolute_advantage" or "relative_advantage"
         
     Returns:
-        Array of rewards for each frame
+        Array of advantage values for each frame
     """
     n_frames = len(data)
-    rewards = np.zeros(n_frames, dtype=np.float32)
     if advantage_source == "absolute_advantage":
-        absolute_advantage = data['absolute_advantage'].values
-        for i in range(n_frames):
-            rewards[i] = absolute_advantage[i]
+        return data['absolute_advantage'].values.astype(np.float32)
     elif advantage_source == "relative_advantage":
-        relative_advantage = data['relative_advantage'].values
-        for i in range(n_frames):
-            rewards[i] = relative_advantage[i]
-    elif advantage_source == "progress":
-        progress = data['progress'].values
-        for i in range(n_frames):
-            if i + chunk_size < n_frames:
-                rewards[i] = progress[i + chunk_size] - progress[i]
-            else:
-                # For frames near the end, use the last available frame
-                rewards[i] = (progress[-1] - progress[i]) / (len(progress) - i) * chunk_size
+        return data['relative_advantage'].values.astype(np.float32)
     else:
-        raise ValueError(f"Unknown advantage source: {advantage_source}")
-    return rewards
+        raise ValueError(f"Unknown advantage source: {advantage_source}. "
+                         f"Must be 'absolute_advantage' or 'relative_advantage'.")
 
 
 def get_stage_index(stage_progress_gt: float, stage_nums: int) -> int:
@@ -91,7 +79,7 @@ def get_stage_index(stage_progress_gt: float, stage_nums: int) -> int:
     return stage_idx
 
 
-def collect_all_rewards(base_path: str, chunk_size: int = 50, advantage_source: str = "progress",
+def collect_all_rewards(base_path: str, chunk_size: int = 50, advantage_source: str = "absolute_advantage",
                         stage_nums: int = 1) -> Tuple[Dict[int, List[float]], List[str]]:
     """
     Collect all rewards from all parquet files to compute statistics.
@@ -223,9 +211,9 @@ def update_tasks_jsonl(base_path: str, discretion_type: str, n_slices: int = 10)
 def assign_task_index(parquet_file: str, threshold_percentile: float, 
                       chunk_size: int = 50, discretion_type: str = "binary",
                       percentile_boundaries: List[float] = None, n_slices: int = 10,
-                      advantage_source: str = "progress") -> None:
+                      advantage_source: str = "absolute_advantage") -> None:
     """
-    Assign task_index to frames in a parquet file based on reward threshold.
+    Assign task_index to frames in a parquet file based on advantage threshold.
     (Used when stage_nums=1)
     
     Args:
@@ -269,7 +257,7 @@ def assign_task_index_staged(parquet_file: str,
                              chunk_size: int = 50, 
                              discretion_type: str = "binary",
                              n_slices: int = 10,
-                             advantage_source: str = "progress",
+                             advantage_source: str = "absolute_advantage",
                              stage_nums: int = 1) -> None:
     """
     Assign task_index to frames in a parquet file based on stage-specific thresholds.
@@ -330,7 +318,7 @@ def assign_task_index_staged(parquet_file: str,
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Modify task_index in parquet files based on progress rewards"
+        description="Discretize predicted advantage values into task_index labels"
     )
     parser.add_argument(
         "data_path",
@@ -365,8 +353,9 @@ def main():
     parser.add_argument(
         "--advantage-source",
         type=str,
-        default="progress",
-        choices=["progress", "absolute_advantage", "relative_advantage"]
+        default="absolute_advantage",
+        choices=["absolute_advantage", "relative_advantage"],
+        help="Which predicted advantage column to use (default: absolute_advantage)"
     )
     parser.add_argument(
         "--stage-nums",
@@ -396,7 +385,7 @@ def main():
         print(f"Threshold: {args.threshold}% (top {args.threshold}% will be task_index=1)")
     elif args.discretion_type == "n_slices":
         print(f"Number of slices: {args.n_slices}")
-    print(f"Progress offset: {args.chunk_size} frames")
+    print(f"Chunk size: {args.chunk_size} frames")
     print(f"Stage nums: {args.stage_nums}")
     if args.stage_nums > 1:
         step = 1.0 / args.stage_nums

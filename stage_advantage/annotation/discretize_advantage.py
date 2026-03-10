@@ -175,30 +175,32 @@ def compute_reward_statistics(rewards: List[float]) -> dict:
     return stats
 
 
-def update_tasks_jsonl(base_path: str, discretion_type: str, n_slices: int = 10) -> None:
+def update_tasks_jsonl(base_path: str, discretion_type: str, n_slices: int = 10,
+                       task_text: str = "fold the cloth") -> None:
     """
     Update the tasks.jsonl file based on discretization type.
-    
+
     Args:
         base_path: Base directory path containing meta/tasks.jsonl
         discretion_type: Type of discretization ("binary" or "n_slices")
         n_slices: Number of slices for n_slices mode
+        task_text: Base task description (default: "fold the cloth")
     """
     tasks_file = os.path.join(base_path, "meta", "tasks.jsonl")
-    
+
     # Ensure meta directory exists
     meta_dir = os.path.join(base_path, "meta")
     os.makedirs(meta_dir, exist_ok=True)
-    
+
     tasks = []
     if discretion_type == "binary":
         tasks = [
-            {"task_index": 0, "task": "fold the cloth, Advantage: negative"},
-            {"task_index": 1, "task": "fold the cloth, Advantage: positive"},
+            {"task_index": 0, "task": f"{task_text}, Advantage: negative"},
+            {"task_index": 1, "task": f"{task_text}, Advantage: positive"},
         ]
     elif discretion_type == "n_slices":
         for i in range(n_slices):
-            tasks.append({"task_index": i, "task": f"fold the cloth, Advantage: {i}"})
+            tasks.append({"task_index": i, "task": f"{task_text}, Advantage: {i}"})
     
     # Write tasks to jsonl file
     with open(tasks_file, 'w') as f:
@@ -243,15 +245,31 @@ def assign_task_index(parquet_file: str, threshold_percentile: float,
         task_index[rewards >= percentile_boundaries[-1]] = n_slices - 1
     else:
         raise ValueError(f"Unknown discretion_type: {discretion_type}")
-    
+
+    # Force intervention frames to positive (pi*0.6 intervention forcing).
+    # Human corrections are expert demonstrations by definition -- the advantage
+    # estimator may assign low values at intervention moments (the robot was
+    # failing right before the human took over), but the corrective action itself
+    # is high-quality behavior we want the model to learn.
+    if "intervention" in df.columns:
+        intervention_vals = df["intervention"].to_numpy()
+        if intervention_vals.ndim > 1:
+            intervention_vals = intervention_vals[:, 0]
+        human_mask = intervention_vals == 1
+        max_index = 1 if discretion_type == "binary" else n_slices - 1
+        task_index[human_mask] = max_index
+        forced = int(human_mask.sum())
+        if forced > 0:
+            print(f"  Forced {forced} intervention frames to positive in {os.path.basename(parquet_file)}")
+
     # Add or update task_index column
     df['task_index'] = task_index
-    
+
     # Save back to parquet file
     df.to_parquet(parquet_file, index=False)
 
 
-def assign_task_index_staged(parquet_file: str, 
+def assign_task_index_staged(parquet_file: str,
                              threshold_percentiles_by_stage: Dict[int, float],
                              percentile_boundaries_by_stage: Dict[int, List[float]],
                              chunk_size: int = 50, 
@@ -308,10 +326,22 @@ def assign_task_index_staged(parquet_file: str,
             if reward >= boundaries[-1]:
                 slice_idx = n_slices - 1
             task_index[frame_idx] = slice_idx
-    
+
+    # Force intervention frames to positive (pi*0.6 intervention forcing).
+    if "intervention" in df.columns:
+        intervention_vals = df["intervention"].to_numpy()
+        if intervention_vals.ndim > 1:
+            intervention_vals = intervention_vals[:, 0]
+        human_mask = intervention_vals == 1
+        max_index = 1 if discretion_type == "binary" else n_slices - 1
+        task_index[human_mask] = max_index
+        forced = int(human_mask.sum())
+        if forced > 0:
+            print(f"  Forced {forced} intervention frames to positive in {os.path.basename(parquet_file)}")
+
     # Add or update task_index column
     df['task_index'] = task_index
-    
+
     # Save back to parquet file
     df.to_parquet(parquet_file, index=False)
 
@@ -366,6 +396,12 @@ def main():
              "2 means divide by 0.5 (frames with stage_progress_gt < 0.5 and >= 0.5). "
              "3 means divide by 1/3 and 2/3, etc. "
              "Each stage calculates its own reward percentiles independently. (default: 1)"
+    )
+    parser.add_argument(
+        "--task-text",
+        type=str,
+        default="fold the cloth",
+        help="Base task description for tasks.jsonl entries (default: 'fold the cloth')"
     )
     parser.add_argument(
         "--dry-run",
@@ -476,7 +512,7 @@ def main():
         return
     
     # Step 3: Update tasks.jsonl
-    update_tasks_jsonl(args.data_path, args.discretion_type, args.n_slices)
+    update_tasks_jsonl(args.data_path, args.discretion_type, args.n_slices, args.task_text)
     
     # Step 4: Assign task_index to all parquet files
     print(f"\nAssigning task_index to {len(parquet_files)} files...")

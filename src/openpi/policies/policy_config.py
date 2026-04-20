@@ -91,4 +91,9 @@ def create_trained_policy(
         metadata=train_config.policy_metadata,
         is_pytorch=is_pytorch,
         pytorch_device=pytorch_device if is_pytorch else None,
+        # Wire RTC normalization params from the loaded checkpoint so served prev_action_chunk
+        # is normalized into model space before reaching Pi0RTC.sample_actions().
+        norm_stats=norm_stats,
+        use_quantile_norm=data_config.use_quantile_norm,
+        action_horizon=train_config.model.action_horizon,
     )
